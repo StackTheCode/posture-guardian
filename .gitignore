@@ -1,0 +1,37 @@
+
+#Python
+__pycache__/
+*.py[cod]
+venv/
+.env
+
+# Java/Maven
+target/
+*.class
+*.jar
+*.war
+*.ear
+
+
+# C++
+build/
+*.exe
+*.0
+*.so
+*.dll
+
+
+# Node
+node_modules/
+dist/
+ .env.local
+
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
