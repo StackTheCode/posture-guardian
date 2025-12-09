@@ -14,7 +14,7 @@ AI-powered desktop agent for posture monitoring and ergonomic health.
 ### Prerequisites
 - Docker & Docker Compose
 - Python 3.10+
-- Java 17+
+- Java 21
 - Node.js 18+
 - CMake 3.20+ (for C++)
 

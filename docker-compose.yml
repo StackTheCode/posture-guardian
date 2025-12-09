@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   postgres:
-    image: postgres:15-alpine
+    image: postgres:17-alpine
     environment:
       POSTGRES_DB: posture_guardian
       POSTGRES_USER: pguser
@@ -13,7 +13,7 @@ services:
     - postgres_data:/var/lib/postgresql/data
 
   redis:
-    image: redis:7-alpine
+    image: redis:8-alpine
     ports:
       - "6379:6379"
 
@@ -34,12 +34,12 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/posture_guardian
       SPRING_DATASOURCE_USERNAME: pguser
       SPRING_DATASOURCE_PASSWORD: pgpass
-      REDIS_HOST:redis
+      REDIS_HOST: redis
     depends_on:
       - postgres
       - redis
       - ml-engine
 
 
-volumes:
-  postgres_data  
+volumes: 
+  postgres_data:

@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "posture-ml-engine"
+version = "0.1.0"
+description = "Posture detection ML service"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = "^0.109.0"
+uvicorn = {extras = ["standard"], version = "^0.27.0"}
+mediapipe = "^0.10.9"
+opencv-python = "^4.9.0"
+pydantic = "^2.5.0"
+redis = "^5.0.1"
+python-multipart = "^0.0.6"
+prometheus-client = "^0.19.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.0"
+black = "^24.0.0"
+flake8 = "^7.0.0"
+mypy = "^1.8.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
