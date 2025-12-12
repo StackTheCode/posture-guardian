@@ -4,7 +4,8 @@ from fastapi.responses import Response
 import logging
 from prometheus_client import Counter,Histogram,generate_latest
 from datetime import datetime,timezone
-
+from schemas.posture import PostureAnalysisResponse
+from services.analysis import PostureAnalysisService 
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -23,7 +24,7 @@ version="0.1.0"
 # CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_orgins=["*"], # Don't forget to include backend url in production!
+    allow_origins=["*"], # Don't forget to include backend url in production!
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"]
@@ -47,24 +48,26 @@ async def health_check():
 
 
 @app.post("/analyze-posture", response_model=PostureAnalysisResponse)
-async def analyze_posture(file:UploadFile = File(...)):
-     """
-     Analyze posture from uploaded image
-     """
-     REQUEST_COUNT.inc()
-     try:
-         with REQUEST_DURATION.time():
-            #  Read image
-            image_bytes: await file.read()
-             
+async def analyze_posture(file: UploadFile = File(...)):
+    """
+    Analyze posture from uploaded image
+    """
+    REQUEST_COUNT.inc()
+    
+    try:
+        with REQUEST_DURATION.time():
+            # Read image
+            image_bytes = await file.read()
+            
+            # Analyze
             result = await analysis_service.analyze_image(image_bytes)
-            logger.info(f"Analysis is complete :{result.posture_state}")
-            return result 
-             
-             
-     except Exception as e:
-        logger.error(f"analysis failed: {str(e)}")
-        raise HTTPException(status_code=500,detail=str(e))
+            
+            logger.info(f"Analysis complete: {result.posture_state}")
+            return result
+            
+    except Exception as e:
+        logger.error(f"Analysis failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
     
     
 

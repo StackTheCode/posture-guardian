@@ -13,8 +13,8 @@ class PostureState(str,Enum):
  
  
 class PostureAnalysisRequest(BaseModel):
-       image_request64 =Optional[str] = None
-       timestamp =Optional[str] = None
+    image_base64: Optional[str] = None
+    timestamp: Optional[str] = None
 
 
 class KeyPoint(BaseModel):
@@ -24,16 +24,22 @@ class KeyPoint(BaseModel):
     
     
 
-class PostureAnalysisResponse:
-    json_schema_extra ={
-        "example":{
-            "posture_state":"forward_lean",
-            "confidence": 0.87,
-            "severity": 0.65,
-            "recommendations":[
-                   "Adjust your screen height",
+class PostureAnalysisResponse(BaseModel):
+    posture_state: PostureState
+    confidence: float = Field(..., ge=0.0, le=1.0)
+    severity: float = Field(..., ge=0.0, le=1.0, description="0=perfect, 1=very bad")
+    recommendations: List[str]
+    keypoints: Optional[dict] = None
+    
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "posture_state": "forward_lean",
+                "confidence": 0.87,
+                "severity": 0.65,
+                "recommendations": [
+                    "Adjust your screen height",
                     "Move screen closer to eye level"
-            ]
-            
+                ]
+            }
         }
-    }

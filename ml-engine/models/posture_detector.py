@@ -38,17 +38,17 @@ class PostureDetector:
          right_hip = landmarks[self.mp_pose.PoseLandmark.RIGHT_HIP]
          
         #  Calculate posture metrics
-         posture_state,confidence = self._classify_posture(
+         posture_state,confidence = self.classify_posture(
              nose,left_shoulder,right_shoulder,left_hip,right_hip
          )
          
-         key_points = {
+         keypoints = {
              "nose":{"x": nose.x, "y": nose.y, "confidence":nose.visibility},
              "left_shoulder":{"x":left_shoulder.x,"y": left_shoulder.y,"confidence":left_shoulder.visibility},
              "right_shoulder" :{"x":right_shoulder.x,"y": right_shoulder.y,"confidence":right_shoulder.visibility}
              
          }
-         return posture_state,confidence,key_points
+         return posture_state,confidence,keypoints
      
      
     
