@@ -5,6 +5,7 @@ import com.rk.postguard.entity.PostureEvent;
 import com.rk.postguard.service.PostureService;
 import jakarta.validation.Valid;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -14,8 +15,9 @@ import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/api/v1/posture")
+@RequiredArgsConstructor
 public class PostureController {
-    private PostureService postureService;
+    private final PostureService postureService;
 
     @PostMapping("/events")
     public ResponseEntity createPostureEvent(@Valid @RequestBody PostureEventDto dto, Authentication authentication) {
