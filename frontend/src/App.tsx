@@ -1,10 +1,34 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import './index.css'
+import LoginPage from './pages/LoginPage'
+import { useAuthStore } from './store/authStore'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { DashboardPage } from './pages/DashboardPage'
+
+
+const queryClient = new QueryClient()
+
+const PrivateRoute = ({ children } :{ children:React.ReactNode}) => {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  return isAuthenticated ? <> {children}</> : <Navigate to="/login" />
+
+}
 
 function App() {
   return (
-    <>
-    <h1 className='text-4xl'>Hello</h1>
-    </>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <Routes>
+          <Route path='/login' element={<LoginPage />} />
+          <Route path='/dashboard'
+            element={
+              <PrivateRoute>
+                <DashboardPage />
+              </PrivateRoute>} />
+              <Route path='/' element={<Navigate to="/dashboard"/>}/>
+        </Routes>
+      </BrowserRouter>
+    </QueryClientProvider>
   )
 }
 

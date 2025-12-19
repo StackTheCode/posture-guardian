@@ -11,22 +11,25 @@ interface AnimatedButtonProps {
 }
 
 export const AnimatedButton = ({
-    children,
-    onClick,
-    type ='button',
-    variant='primary',
-    className=''
-}:AnimatedButtonProps) => {
-  
+  children,
+  onClick,
+  type = 'button',
+  variant = 'primary',
+  className = ''
+}: AnimatedButtonProps) => {
+
   const baseStyles = "px-6 py-3 rounded-xl font-semibold transition-all";
-const variantStyles = {
-    primary:"bg-gradient-to-r from-purple-600 to blue-600 hover:from-purple-500 hover:to-blue-500",
+  const variantStyles = {
+    primary: "bg-gradient-to-r from-purple-600 to blue-600 hover:from-purple-500 hover:to-blue-500",
     secondary: "glass hover:glass-strong"
 
-};
-return(
-    {children}
-)  
+  };
+  return (
+    <div className='flex justify-center'>
+      {children}
+
+    </div>
+  )
 
 }
 
