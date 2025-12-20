@@ -1,4 +1,4 @@
-import { div } from "motion/react-client";
+
 import { PostureState } from "../../types"
 import { AlertCircle, CheckCircle } from 'lucide-react'
 import {motion} from 'framer-motion'
@@ -43,7 +43,7 @@ export const PostureIndicator = ({ state, confidence, severity }: PostureIndicat
     <motion.div
       initial={{ scale: 0 }}
       animate={{ scale: 1 }}
-      className={`relative w-48 h-48 mx-auto rounded-full bg-gradient-to-br ${config.color} 
+      className={`relative w-48 h-48 mx-auto rounded-full bg-linear-to-br ${config.color} 
                   flex flex-col items-center justify-center shadow-2xl`}
     >
       <motion.div
@@ -67,7 +67,7 @@ export const PostureIndicator = ({ state, confidence, severity }: PostureIndicat
         initial={{ width: 0 }}
         animate={{ width: `${severity * 100}%` }}
         transition={{ duration: 1, ease: 'easeOut' }}
-        className={`h-full bg-gradient-to-r ${config.color}`}
+        className={`h-full bg-linear-to-r ${config.color}`}
       />
     </div>
     <p className="text-center text-sm text-slate-400 mt-2">

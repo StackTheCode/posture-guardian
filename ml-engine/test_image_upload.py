@@ -1,7 +1,7 @@
 import requests
 # poetry run uvicorn main:app --reload
 # poetry run python test_image_upload.py
-image_path = "C:\\Users\\user\Desktop\\test_image.jpg"
+image_path = "tests/data/test_image.jpg"
 with open(image_path,'rb') as f :
     files = {'file':('image.jpg',f,'image/jpeg' )}
     response = requests.post('http://localhost:8000/analyze-posture', files=files)

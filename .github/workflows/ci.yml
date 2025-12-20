@@ -27,6 +27,7 @@ jobs:
         run: poetry install
       
       - name: Run tests
+        run: poetry run pytest tests/
         working-directory: ./ml-engine
         run: poetry run pytest
 
