@@ -27,9 +27,8 @@ jobs:
         run: poetry install
       
       - name: Run tests
-        run: poetry run pytest tests/
         working-directory: ./ml-engine
-        run: poetry run pytest
+        run: poetry run pytest tests/
 
   test-backend:
     runs-on: ubuntu-latest
