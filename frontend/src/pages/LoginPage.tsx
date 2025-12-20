@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Eye, EyeClosed, EyeOff } from 'lucide-react'
+import { Eye, EyeOff } from 'lucide-react'
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { authApi } from '../services/api';
@@ -47,7 +47,7 @@ const LoginPage = () => {
                     animate={{ y: 0 }}
                     className="text-center mb-8"
                 >
-                    <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 
+                    <h1 className="text-4xl font-bold bg-linear-to-r from-purple-400 to-blue-400 
                        bg-clip-text text-transparent">
                         Posture Guardian
                     </h1>

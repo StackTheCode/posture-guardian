@@ -4,6 +4,7 @@ import LoginPage from './pages/LoginPage'
 import { useAuthStore } from './store/authStore'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { DashboardPage } from './pages/DashboardPage'
+import RegisterPage from './pages/RegisterPage'
 
 
 const queryClient = new QueryClient()
@@ -19,6 +20,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <Routes>
+          <Route path="/register" element={<RegisterPage/>}/>
           <Route path='/login' element={<LoginPage />} />
           <Route path='/dashboard'
             element={

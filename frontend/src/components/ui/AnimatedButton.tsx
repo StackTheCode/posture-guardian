@@ -20,15 +20,18 @@ export const AnimatedButton = ({
 
   const baseStyles = "px-6 py-3 rounded-xl font-semibold transition-all";
   const variantStyles = {
-    primary: "bg-gradient-to-r from-purple-600 to blue-600 hover:from-purple-500 hover:to-blue-500",
+    primary: "bg-sky-500 hover:bg-sky-400 text-slate-900 hover:from-purple-500 hover:to-blue-500",
     secondary: "glass hover:glass-strong"
 
   };
   return (
-    <div className='flex justify-center'>
-      {children}
-
-    </div>
+ <motion.button type={type}
+ onClick={onClick}
+ whileTap={{scale:0.96}}
+ whileHover={{scale:1.02}}
+ className={`${baseStyles} ${variantStyles[variant]} ${className}`}>
+{children}
+ </motion.button>
   )
 
 }
