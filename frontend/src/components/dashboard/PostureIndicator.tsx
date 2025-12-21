@@ -43,18 +43,18 @@ export const PostureIndicator = ({ state, confidence, severity }: PostureIndicat
     <motion.div
       initial={{ scale: 0 }}
       animate={{ scale: 1 }}
-      className={`relative w-48 h-48 mx-auto rounded-full bg-linear-to-br ${config.color} 
+      className={`relative w-30 h-30 mx-auto rounded-full bg-linear-to-br ${config.color} 
                   flex flex-col items-center justify-center shadow-2xl`}
     >
       <motion.div
         animate={{ rotate: [0, 5, -5, 0] }}
         transition={{ duration: 3, repeat: Infinity }}
       >
-        <Icon className="w-16 h-16 text-white mb-2" />
+        <Icon className="w-8 h-8 text-white mb-2" />
       </motion.div>
       
       <div className="text-center">
-        <p className="text-xl font-bold text-white">{config.label}</p>
+        <p className="text-sm font-bold text-white">{config.label}</p>
         <p className="text-sm text-white/80 mt-1">
           {(confidence * 100).toFixed(0)}% confident
         </p>
