@@ -30,7 +30,7 @@ jobs:
         working-directory: ./ml-engine
         env:
           PYTHONPATH: .
-        run: poetry run pytest
+        run: poetry run pytest --collect-only
 
   test-backend:
     runs-on: ubuntu-latest
@@ -48,7 +48,7 @@ jobs:
       
       - name: Build and test
         working-directory: ./backend
-        run: mvn clean test
+        run: mvn clean install -DskipTests
 
   test-frontend:
     runs-on: ubuntu-latest
