@@ -15,6 +15,7 @@ target/
 
 
 # C++
+desktop-agent/include/nlohmann/json.hpp
 build/
 *.exe
 *.0

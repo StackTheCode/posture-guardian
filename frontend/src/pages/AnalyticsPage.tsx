@@ -62,7 +62,7 @@ export const AnalyticsPage = () => {
         <p className="text-slate-400 mt-1">Detailed insights into your posture habits</p>
       </motion.div>
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6'>
-        {insights.map((insight, i) => (
+        {insights.map((insight) => (
           <motion.div initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}>
             <GlassCard className={`bg-linear-to-br ${insight.bg}`}>
