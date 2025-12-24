@@ -1,7 +1,6 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 #include <iostream>
-#include "json.hpp"
 #include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
