@@ -14,13 +14,15 @@ find_package(nlohmann_json REQUIRED)
 set(SOURCES
     src/main.cpp
     src/camera/CameraCapture.cpp
-    # src/network/MLEngineClient.cpp
-    # src/network/BackendClient.cpp
-    # src/utils/Config.cpp
+    src/network/MLEngineClient.cpp
+    src/network/BackendClient.cpp
+    src/utils/Config.cpp
 )
 
 # Executable
 add_executable(posture-guardian ${SOURCES})
+
+target_include_directories(posture-guardian PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 # Link libraries
 target_link_libraries(posture-guardian
