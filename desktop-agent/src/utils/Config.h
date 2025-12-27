@@ -6,7 +6,7 @@
 using json = nlohmann::json;
 class Config{
  public:
-     static Config& getinstance(){
+     static Config& getInstance(){
         static Config instance;
         return instance;
      }
@@ -14,9 +14,10 @@ class Config{
 
     std::string getEngineUrl()  const {return mlEngineUrl;}
     std::string getBackendUrl() const {return backendUrl;}
-    int getCaptureinterval() const {return captureInterval;}
+    int getCaptureInterval() const {return captureInterval;}
     int getCameraIndex() const {return cameraIndex;}
     std::string getUsername() const {return token;}
+    std::string getToken() const { return token; }
     void setToken(const std::string& t){token = t;}
 
 private:
