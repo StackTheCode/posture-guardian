@@ -4,5 +4,5 @@
     "capture_interval_seconds": 30,
     "camera_index":0,
     "username":"testuser",
-    "token":"eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0dXNlciIsImlhdCI6MTc2Njg0NjQ1MSwiZXhwIjoxNzY2OTMyODUxfQ.sJfHAx6HWIzCJs1aSGby12DG38SJW1N06XQC3RJmm-WD2aQbEK9ih5vL4Dyddk5mFGNwzcNGFTROj33UyQR1PQ"
+    "token":"eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0dXNlciIsImlhdCI6MTc2Njg2MTQ3MSwiZXhwIjoxNzY2OTQ3ODcxfQ.T3w64p8elmvRnhn1GBi7tDmnlqxaa45yxk24Svd2ed7BoZFURrgfh1ticIKJ20vNmnl0BM5ThgmfKMbUyoYm-Q"
 }
