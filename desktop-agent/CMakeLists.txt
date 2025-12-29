@@ -17,10 +17,12 @@ set(SOURCES
     src/network/MLEngineClient.cpp
     src/network/BackendClient.cpp
     src/utils/Config.cpp
+    src/utils/Notification.cpp
+    src/ui/TrayIcon.cpp
 )
 
 # Executable
-add_executable(posture-guardian ${SOURCES})
+add_executable(posture-guardian      ${SOURCES})
 
 target_include_directories(posture-guardian PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
@@ -29,6 +31,7 @@ target_link_libraries(posture-guardian
     ${OpenCV_LIBS}
     CURL::libcurl
     nlohmann_json::nlohmann_json
+    shell32
 )
 
 # Copy config file to build directory

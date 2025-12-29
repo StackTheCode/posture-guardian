@@ -64,20 +64,20 @@ class PostureDetector:
         # if nose is significantly forward relative to shoulders
         forward_offset = nose.y - shoulder_center_y
         
-        if forward_offset < -0.05: #Nose is above shoulders(leaning forward)
+        if forward_offset < -0.15: #Nose is above shoulders(leaning forward)
             severity = abs(forward_offset) * 10
             return PostureState.FORWARD_LEAN,min(0.9,0.6+severity)
         
         # Slouch detection: If shoulders are way too forawrd relative to hips
         slouch_offset = shoulder_center_y - hip_center_y
         torso_length = abs(shoulder_center_y - hip_center_y)
-        if torso_length < 0.25:# Compressed torso = slouching
+        if torso_length < 0.20:# Compressed torso = slouching
             return PostureState.SLOUCHED,0.75 
         
         # Shoulder tilt detection
         shoulder_tilt = abs(left_shoulder.y - right_shoulder.y)
         
-        if shoulder_tilt > 0.05:
+        if shoulder_tilt > 0.08 :
             return PostureState.SHOULDER_TILT,0.70
         
         return PostureState.GOOD, 0.85
