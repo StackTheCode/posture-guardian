@@ -51,36 +51,47 @@ class PostureDetector:
          return posture_state,confidence,keypoints
      
      
+    def classify_posture(self, nose, left_shoulder, right_shoulder, left_hip, right_hip) -> Tuple[PostureState, float]:
+    # 1. Centers and Reference Lengths
+     shoulder_center_y = (left_shoulder.y + right_shoulder.y) / 2
+     hip_center_y = (left_hip.y + right_hip.y) / 2
+     torso_length = abs(shoulder_center_y - hip_center_y)
     
+    # Avoid division by zero if person is not fully in frame
+     if torso_length < 0.1: return PostureState.GOOD, 0.5
+
+    # 2. Shoulder Tilt (Normalize by torso length)
+     shoulder_tilt = abs(left_shoulder.y - right_shoulder.y) / torso_length
+     if shoulder_tilt > 0.15:  # Relative tilt
+         return PostureState.SHOULDER_TILT, 0.8
+
+    # 3. Forward Lean (Nose position relative to shoulder height)
+    # Use a ratio of torso length to make it distance-independent
+     forward_ratio = (shoulder_center_y - nose.y) / torso_length
     
-    def classify_posture(self,nose,left_shoulder,right_shoulder,left_hip,right_hip) -> Tuple[PostureState,float]:
-        """
-        Classify posture based on landmark positions
-        """
-        shoulder_center_y = (left_shoulder.y + right_shoulder.y) / 2
-        hip_center_y = (left_hip.y + right_hip.y) / 2
-        
-        # Forward lean detection
-        # if nose is significantly forward relative to shoulders
-        forward_offset = nose.y - shoulder_center_y
-        
-        if forward_offset < -0.15: #Nose is above shoulders(leaning forward)
-            severity = abs(forward_offset) * 10
-            return PostureState.FORWARD_LEAN,min(0.9,0.6+severity)
-        
-        # Slouch detection: If shoulders are way too forawrd relative to hips
-        slouch_offset = shoulder_center_y - hip_center_y
-        torso_length = abs(shoulder_center_y - hip_center_y)
-        if torso_length < 0.20:# Compressed torso = slouching
-            return PostureState.SLOUCHED,0.75 
-        
-        # Shoulder tilt detection
-        shoulder_tilt = abs(left_shoulder.y - right_shoulder.y)
-        
-        if shoulder_tilt > 0.08 :
-            return PostureState.SHOULDER_TILT,0.70
-        
-        return PostureState.GOOD, 0.85
+    # If the nose 'drops' too close to the shoulder line (ratio gets smaller)
+    # or moves too far (ratio gets very large), it indicates leaning.
+    # ADJUST THESE based on your 'debug' frame saves
+     if forward_ratio < 0.35: 
+        return PostureState.FORWARD_LEAN, 0.85
+
+    # 4. Slouching (Compressed Torso)
+    # Use your saved debug frames to find your 'perfect' torso_length
+    # then check if current length is < 80% of that.
+     if torso_length < 0.20:
+        return PostureState.SLOUCHED, 0.9
+
+    # 5. Alignment Score
+     shoulder_center_x = (left_shoulder.x + right_shoulder.x) / 2
+     hip_center_x = (left_hip.x + right_hip.x) / 2
+     alignment_offset = abs(shoulder_center_x - hip_center_x)
+
+     if alignment_offset > 0.1:
+         return PostureState.SLOUCHED, 0.7
+
+     return PostureState.GOOD, 0.95 
+    
+   
     
     def __del__(self):
         self.pose.close()

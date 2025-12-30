@@ -68,7 +68,7 @@ void monitoringLoop(
                 );
             }
         } else {
-            std::cerr << " ML analysis failed" << std::endl;
+            std::cerr << "ML analysis failed" << std::endl;
         }
 
         // Wait for next capture
@@ -77,7 +77,7 @@ void monitoringLoop(
 }
 
 int main(int argc, char* argv[]) {
-    std::cout << " Posture Guardian - Desktop Agent" << std::endl;
+    std::cout << "Posture Guardian - Desktop Agent" << std::endl;
 
 
     // Load configuration
@@ -120,17 +120,17 @@ int main(int argc, char* argv[]) {
     };
 
     tray.onSettings = [&]() {
-        std::cout << "⚙ Settings clicked" << std::endl;
+        std::cout << "Settings clicked" << std::endl;
         Notification::show("Settings", "Settings UI coming soon!");
     };
 
     tray.onExit = [&]() {
-        std::cout << " Exiting..." << std::endl;
+        std::cout << "Exiting..." << std::endl;
         running = false;
     };
 
  
-    std::cout << " Monitoring in background (check system tray)" << std::endl;
+    std::cout << "Monitoring in background (check system tray)" << std::endl;
 
     // Show initial notification
     Notification::show(
