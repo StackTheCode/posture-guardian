@@ -11,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -39,12 +38,15 @@ public class PostureService {
 
         event = postureEventRepository.save(event);
 
+        PostureEventDto savedDto = mapToDto(event);
         // Send real-time update via WebSocket
-        webSocketService.sendPostureUpdate(username, dto);
+        webSocketService.sendPostureAnalysis(username,dto);
+
+        webSocketService.broadcastPostureUpdate(username, dto);
 
         log.info("Saved posture event for user: {} - State: {}", username, dto.getPostureState());
 
-        return mapToDto(event);
+        return savedDto;
     }
 
     public List<PostureEventDto> getPostureEvents(String username, LocalDateTime start, LocalDateTime end) {

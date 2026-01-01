@@ -1,10 +1,11 @@
 package com.rk.postguard.service;
 
 import com.rk.postguard.dto.PostureEventDto;
-import com.rk.postguard.entity.PostureEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -12,7 +13,20 @@ public class WebSocketService {
     private  final SimpMessagingTemplate messagingTemplate;
 
 
-    public void sendPostureUpdate(String username, PostureEventDto postureEventDto) {
-        messagingTemplate.convertAndSendToUser(username,"/topic/posture-updates", postureEventDto);
+    public void broadcastPostureUpdate(String username, PostureEventDto postureEventDto) {
+        // This targets: /topic/posture-updates (Global)
+        // We wrap it in a Map to include the username for the dashboard
+        Map<String, Object> payload = Map.of(
+                "username", username,
+                "event", postureEventDto,
+                "timestamp", System.currentTimeMillis()
+        );
+
+        messagingTemplate.convertAndSend("/topic/posture-updates", (Object) payload);
+    }
+
+    public void sendPostureAnalysis(String username, PostureEventDto postureEventDto){
+// This targets: /user/{username}/queue/posture
+        messagingTemplate.convertAndSendToUser(username,"/queue/posture",postureEventDto );
     }
 }
