@@ -27,6 +27,12 @@ public class WebSocketService {
 
     public void sendPostureAnalysis(String username, PostureEventDto postureEventDto){
 // This targets: /user/{username}/queue/posture
+        System.out.println("=== WebSocket Debug ===");
+        System.out.println("Sending to user: " + username);
+        System.out.println("Destination: /queue/posture");
+        System.out.println("Payload: " + postureEventDto);
         messagingTemplate.convertAndSendToUser(username,"/queue/posture",postureEventDto );
+        System.out.println("Message sent successfully");
+        System.out.println("=====================");
     }
 }
