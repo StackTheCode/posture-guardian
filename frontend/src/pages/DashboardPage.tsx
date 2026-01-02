@@ -9,7 +9,6 @@ import { useNavigate } from "react-router-dom";
 import { BarChart3, LogOut, Wifi, WifiOff } from "lucide-react";
 import { useAuthStore } from "../store/authStore";
 import { usePostureWebSocket } from "../hooks/usePostureWebSocket";
-import { useEffect } from "react";
 
 
 export const DashboardPage = () => {
