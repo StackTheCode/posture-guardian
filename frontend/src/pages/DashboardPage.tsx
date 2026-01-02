@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { BarChart3, LogOut, Wifi, WifiOff } from "lucide-react";
 import { useAuthStore } from "../store/authStore";
 import { usePostureWebSocket } from "../hooks/usePostureWebSocket";
+import { useEffect } from "react";
 
 
 export const DashboardPage = () => {
@@ -18,7 +19,7 @@ export const DashboardPage = () => {
   const { postureData, isConnected } = usePostureWebSocket(username!, token!);
 
 
-  const handleLogout = async () => {
+  const handleLogout =  () => {
     logout();
     navigate('/login');
   }
@@ -38,6 +39,8 @@ export const DashboardPage = () => {
   const currentPosture = postureData?.postureState || PostureState.GOOD;
   const confidence = postureData?.confidence || 0.85;
   const severity = postureData?.severity || 0.2;
+
+
 
   return (
     <div className="min-h-screen p-6 flex flex-col gap-10">
