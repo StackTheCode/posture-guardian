@@ -9,13 +9,19 @@ import { useNavigate } from "react-router-dom";
 import { BarChart3, LogOut, Wifi, WifiOff } from "lucide-react";
 import { useAuthStore } from "../store/authStore";
 import { usePostureWebSocket } from "../hooks/usePostureWebSocket";
+import { usePostureAnalytics } from "../hooks/usePostureAnalytics";
 
 
 export const DashboardPage = () => {
   const navigate = useNavigate();
   const { logout, username, token } = useAuthStore();
 
+  // Real time posture Indicator update
   const { postureData, isConnected } = usePostureWebSocket(username!, token!);
+
+// Anallytics data  for stats and timeline
+  const {analytics,loading} = usePostureAnalytics();
+
 
 
   const handleLogout =  () => {
@@ -23,16 +29,6 @@ export const DashboardPage = () => {
     navigate('/login');
   }
 
-  const timelineData = [
-    { time: '9:00', severity: 0.2, state: 'good' },
-    { time: '10:00', severity: 0.3, state: 'forward_lean' },
-    { time: '11:00', severity: 0.15, state: 'good' },
-    { time: '12:00', severity: 0.5, state: 'slouched' },
-    { time: '13:00', severity: 0.25, state: 'forward_lean' },
-    { time: '14:00', severity: 0.7, state: 'slouched' },
-    { time: '15:00', severity: 0.4, state: 'shoulder_tilt' },
-    { time: '16:00', severity: 0.2, state: 'good' },
-  ];
 
 
   const currentPosture = postureData?.postureState || PostureState.GOOD;
@@ -140,21 +136,40 @@ export const DashboardPage = () => {
       </div>
 
       {/* Stats */}
-      <StatsCards
-        goodPostureCount={45}
-        badPostureCount={12}
-        averageSeverity={0.35}
-        totalEvents={57}
-      />
 
-      {/* Timeline placeholder */}
+      {loading ? (
+        <div className="text-center text-slate-400">Loading analytics...</div>
+      ): (
+         <StatsCards
+        goodPostureCount={analytics.goodPostureCount}
+        badPostureCount={analytics.badPostureCount}
+        averageSeverity={analytics.averageSeverity}
+        totalEvents={analytics.totalEvents}
+      />
+      )
+      }
+     
+
+      {/* Timeline with real data  */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
         className="mt-6"
       >
-        <PostureTimeline data={timelineData} />
+        {analytics.timelineData.length > 0 ? (
+  <PostureTimeline data={analytics.timelineData} />
+        ) :(
+          <GlassCard >
+            <div className="text-center py-8n text-slate-400">
+              <p className="text-sm mt-2">No popsture data yet today</p>
+              <p>P.S start your desktop application to begin tracking</p>
+            </div>
+          </GlassCard>
+        )  
+        
+      }
+      
       </motion.div>
     </div>
   )
