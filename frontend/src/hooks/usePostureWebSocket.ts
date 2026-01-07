@@ -18,27 +18,27 @@ export const usePostureWebSocket = (username: string, token: string) => {
       debug: (str) => console.log('STOMP:', str),
 
       onConnect: () => {
-        console.log('✅ WebSocket connected');
+        console.log(' WebSocket connected');
         setIsConnected(true);
 
-        client.subscribe('/topic/posture-updates', (message) => {
-          console.log('📢 Public topic received:', message.body);
-        });
+        // client.subscribe('/topic/posture-updates', (message) => {
+        //   console.log('Public topic received:', message.body);
+        // });
         // Subscribe to user-specific updates
         client.subscribe(`/user/queue/posture`, (message) => {
           const data = JSON.parse(message.body);
           setPostureData(data);
-          console.log('📨 Received posture update:', data);
+          console.log(' Received posture update:', data);
         });
       },
 
       onDisconnect: () => {
-        console.log('❌ WebSocket disconnected');
+        console.log(' WebSocket disconnected');
         setIsConnected(false);
       },
 
       onStompError: (frame) => {
-        console.error('❌ STOMP error:', frame);
+        console.error(' STOMP error:', frame);
       },
     });
 
