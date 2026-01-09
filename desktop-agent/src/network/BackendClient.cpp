@@ -2,14 +2,67 @@
 #include <curl/curl.h>
 #include "BackendClient.h"
 #include <sstream>
-BackendClient::BackendClient(const std::string &url, const std::string &t)
-    : baseUrl(url), token(t) {}
+#include <iostream>
+
+BackendClient::BackendClient(const std::string& url, const std::string& user, const std::string& pass): baseUrl(url), username(user), password(pass), token("") {}
+
 
 size_t BackendClient::WriteCallback(void *conents, size_t size, size_t nmemb, void *userp)
 {
     ((std::string *)userp)->append((char *)conents, size * nmemb);
     return size * nmemb;
 }
+
+
+
+bool BackendClient::login(){
+    CURL* curl = curl_easy_init();
+     if (!curl) {
+        std::cerr << "Failed to initialize CURL for login" << std::endl;
+        return false;
+    }
+
+    json loginPayload = {
+        {"username", username},
+        {"password",password}
+    };
+
+    std::string jsonStr = loginPayload.dump();
+    std::string readBuffer;
+   std::string url = baseUrl + "/auth/login";
+
+    struct curl_slist *headers = nullptr;
+    headers = curl_slist_append(headers, "Content-Type: application/json");
+    
+    curl_easy_setopt(curl,CURLOPT_URL,url.c_str());
+    curl_easy_setopt(curl,CURLOPT_HTTPHEADER,headers);
+    curl_easy_setopt(curl,CURLOPT_POSTFIELDS,jsonStr.c_str());
+    curl_easy_setopt(curl,CURLOPT_WRITEFUNCTION,WriteCallback);
+    curl_easy_setopt(curl,CURLOPT_WRITEDATA,&readBuffer);
+
+    CURLcode res = curl_easy_perform(curl);
+
+    curl_slist_free_all(headers);
+    curl_easy_cleanup(curl);
+      if (res != CURLE_OK) {
+        std::cerr << "Login failed: " << curl_easy_strerror(res) << std::endl;
+        return false;
+    }
+std::cout << "Full URL: " << url << std::endl;
+std::cout << "Server Response: [" << readBuffer << "]" << std::endl;
+    try{
+      json response = json::parse(readBuffer);
+      token = response["token"];
+      std::cout << "Logged in successfully as "<< username<< std::endl;
+      return true;
+    }  catch(const std::exception& e){
+        std::cout<< "Failed to parse login response: " << e.what() << std::endl;
+        return false;
+    }
+}
+
+
+
 
 bool BackendClient::sendPostureEvent(std::string &postureState, double confidence, double severity)
 {
@@ -68,6 +121,18 @@ bool BackendClient::sendPostureEvent(std::string &postureState, double confidenc
         return false;
     }
 
-    std::cout << "Posture event sent successfully" << std::endl;
-    return true;
+    if(http_code == 401){
+        std::cout << "Token expired ,re-authenticating..." <<std::endl;
+        if(login()){
+            return sendPostureEvent(postureState,confidence,severity);
+        }
+        return false;
+    }
+   if (http_code >= 200 && http_code < 300) {
+        std::cout << "Posture event sent successfully" << std::endl;
+        return true;
+    }
+
+    std::cerr << " Backend returned error: " << http_code << std::endl;
+    return false;
 }

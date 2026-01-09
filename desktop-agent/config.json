@@ -4,5 +4,5 @@
     "capture_interval_seconds": 30,
     "camera_index":0,
     "username":"testuser",
-    "token":"eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0dXNlciIsImlhdCI6MTc2NzgwODcyNSwiZXhwIjoxNzY3ODk1MTI1fQ.P62mpZlgWJ9AJ6yIGssDtgAChXBoaCjZiVtjL6uuaBnB_e6jgC3ngix9m8ae-K8PPI3iGCszAUgdQDT9Ed6_YA"
+    "password":"qwerty1234"
 }   

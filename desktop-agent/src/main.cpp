@@ -59,14 +59,14 @@ void monitoringLoop(
             }
 
             // Send to backend
-            Config& config = Config::getInstance();
-            if (!config.getToken().empty()) {
-                backendClient.sendPostureEvent(
-                    result.postureState,
-                    result.confidence,
-                    result.severity
-                );
-            }
+            // Config& config = Config::getInstance();
+           if (backendClient.isAuthenticated()) {
+    backendClient.sendPostureEvent(
+        result.postureState,
+        result.confidence,
+        result.severity
+    );
+}
         } else {
             std::cerr << "ML analysis failed" << std::endl;
         }
@@ -96,8 +96,12 @@ int main(int argc, char* argv[]) {
 
     // Initialize clients
     MLEngineClient mlClient(config.getEngineUrl());
-    BackendClient backendClient(config.getBackendUrl(), config.getToken());
+    BackendClient backendClient(config.getBackendUrl(), config.getUsername(), config.getPassword());
 
+    if (!backendClient.login()) {
+    std::cerr << " Failed to login. Check username/password in config.json" << std::endl;
+    return 1;
+}
     // Initialize system tray
     TrayIcon tray;
     HINSTANCE hInstance = GetModuleHandle(NULL);

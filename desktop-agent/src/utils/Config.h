@@ -16,9 +16,10 @@ class Config{
     std::string getBackendUrl() const {return backendUrl;}
     int getCaptureInterval() const {return captureInterval;}
     int getCameraIndex() const {return cameraIndex;}
-    std::string getUsername() const {return token;}
-    std::string getToken() const { return token; }
-    void setToken(const std::string& t){token = t;}
+    std::string getUsername() const {return username;}
+    // std::string getToken() const { return token; }
+    std::string getPassword() const {return password;}
+    // void setToken(const std::string& t){token = t;}
 
 private:
     Config() = default;
@@ -27,8 +28,9 @@ private:
     int captureInterval;
     int cameraIndex;
     std::string username;
-    std::string token;
-
+    std::string password;
+    // std::string token;
+     
     
 
 
