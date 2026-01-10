@@ -20,16 +20,29 @@ export const AnalyticsPage = () => {
 
   if (error || !analytics) {
     return (
-      <div className='min-h-screen p-6 flex items-center justify-center'>
+       <div className='min-h-screen p-6 flex items-center justify-center'>
         <div className="glass-strong rounded-2xl p-8 max-w-md text-center">
-          <p className="text-red-400 mb-4">Failed to load analytics</p>
-          <p className="text-slate-400 text-sm">{error || 'Unknown error'}</p>
-          <button 
-            onClick={() => window.location.reload()} 
-            className="mt-4 glass px-6 py-3 rounded-xl hover:glass-strong transition-all"
-          >
-            Retry
-          </button>
+          <div className="w-16 h-16 rounded-full bg-red-500/20 flex items-center justify-center mx-auto mb-4">
+            <span className="text-3xl">⚠️</span>
+          </div>
+          <h2 className="text-xl font-semibold text-red-400 mb-2">Failed to Load Analytics</h2>
+          <p className="text-slate-400 text-sm mb-6">
+            {error || 'Unable to fetch analytics data. Please try again.'}
+          </p>
+          <div className="flex gap-3 justify-center">
+            <button 
+              onClick={() => window.location.reload()} 
+              className="glass px-6 py-3 rounded-xl hover:glass-strong transition-all"
+            >
+              Retry
+            </button>
+            <button 
+              onClick={() => window.history.back()} 
+              className="glass px-6 py-3 rounded-xl hover:glass-strong transition-all"
+            >
+              Go Back
+            </button>
+          </div>
         </div>
       </div>
     );

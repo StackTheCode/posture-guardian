@@ -5,27 +5,45 @@ import { useNavigate } from 'react-router-dom';
 import { authApi } from '../services/api';
 import { useAuthStore } from '../store/authStore';
 import { AnimatedButton } from '../components/ui/AnimatedButton';
+// For notifications
+import toast  from 'react-hot-toast';
+import { handleApiError, showSuccess } from '../utils/errorHandler';
+
+
 
 const LoginPage = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
-    const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
     const login = useAuthStore((state) => state.login);
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        setError('')
+
+        if(!username.trim()     || !password.trim()){
+            toast.error("Please enter both username and password");
+        }
         setLoading(true);
+
+        const loadingToast = toast.loading("Signing in...")
         try {
             const response = await authApi.login(username, password);
             login(response.data.token, response.data.username, response.data.email);
-            navigate('/dashboard');
+            toast.dismiss(loadingToast);
+            showSuccess(`Welcome back, ${response.data.username}!`);
+
+               // Small delay for better UX
+            setTimeout(() => {
+                navigate('/dashboard');
+            }, 500);
 
 
         } catch (err: any) {
-            setError(err.response?.data?.message || 'Login failed');
+            toast.dismiss(loadingToast);
+            handleApiError(err, 'Login failed. Please check your credentials.');
+           
 
         } finally {
             setLoading(false);
@@ -34,8 +52,7 @@ const LoginPage = () => {
 
 
     return (
-
-        <div className="min-h-screen flex items-center justify-center p-4">
+  <div className="min-h-screen flex items-center justify-center p-4">
             <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -67,7 +84,7 @@ const LoginPage = () => {
                             className="w-full px-4 py-3 glass rounded-xl focus:ring-2 focus:ring-purple-500 
                        outline-none transition-all"
                             placeholder="Enter your username"
-                            required
+                            disabled={loading}
                         />
                     </div>
 
@@ -84,29 +101,19 @@ const LoginPage = () => {
                                 className="w-full px-4 py-3 glass rounded-xl focus:ring-2 focus:ring-purple-500 
                          outline-none transition-all pr-12"
                                 placeholder="Enter your password"
-                                required
+                                disabled={loading}
                             />
                             <button
                                 type="button"
                                 onClick={() => setShowPassword(!showPassword)}
                                 className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 
                          hover:text-white transition-colors"
+                                disabled={loading}
                             >
                                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                             </button>
                         </div>
                     </div>
-
-                    {/* Error */}
-                    {error && (
-                        <motion.div
-                            initial={{ opacity: 0, y: -10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="bg-red-500/10 border border-red-500/50 rounded-xl p-3 text-red-400 text-sm"
-                        >
-                            {error}
-                        </motion.div>
-                    )}
 
                     {/* Submit */}
                     <AnimatedButton
@@ -124,6 +131,7 @@ const LoginPage = () => {
                             type="button"
                             onClick={() => navigate('/register')}
                             className="text-purple-400 hover:text-purple-300 transition-colors font-medium"
+                            disabled={loading}
                         >
                             Sign up
                         </button>
