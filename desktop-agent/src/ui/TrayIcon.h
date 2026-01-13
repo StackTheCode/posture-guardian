@@ -16,14 +16,18 @@ class TrayIcon{
     void setTooltip(const std::string& text);
     void setIcon(const std::string& state);
     void showContextMenu();
-
+    void showNotification(
+       const std::string& title,
+       const std::string& message,
+       DWORD icon = NIIF_INFO
+);
     // Callbacks
     std::function<void()> onPauseResume;
     std::function<void()> onSettings;
     std::function<void()> onExit;
 
-    bool isPaused() const {return paused;}
-    void togglePause(){paused = !paused;}
+bool isPaused() const;
+void togglePause();
 
     void processMessages();
 
