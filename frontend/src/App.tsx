@@ -6,6 +6,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { DashboardPage } from './pages/DashboardPage'
 import RegisterPage from './pages/RegisterPage'
 import { AnalyticsPage } from './pages/AnalyticsPage'
+import { SettingsPage } from './pages/SettingsPage'
 
 
 const queryClient = new QueryClient()
@@ -36,6 +37,14 @@ function App() {
               <AnalyticsPage/>
             </PrivateRoute>
            }/>   
+           <Route
+           path="/settings"
+           element={
+            <PrivateRoute>
+              <SettingsPage/>
+            </PrivateRoute>
+           }
+           />
         </Routes>
       </BrowserRouter>
     </QueryClientProvider>

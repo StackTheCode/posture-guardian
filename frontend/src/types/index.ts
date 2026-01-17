@@ -3,6 +3,17 @@ export interface User {
   email: string;
 }
 
+export interface UserSettings {
+  captureIntervalSeconds:number;
+  notificationsEnabled:boolean;
+  notificationSensitivity: 'low' | 'medium' | 'high';
+  workingHoursEnabled: boolean;
+  workingHoursStart:string; // "09:00:00"
+  workingHoursEnd:string;
+  cameraIndex:number;
+  theme: 'dark' | 'light'
+}
+
 export interface AuthResponse {
   token: string;
   username: string;

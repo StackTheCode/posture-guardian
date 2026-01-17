@@ -1,5 +1,5 @@
 import axios from "axios";
-import type {  PostureEvent } from "../types";
+import {  type UserSettings, type PostureEvent } from "../types";
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api/v1';
 
@@ -51,6 +51,15 @@ export const analyticsApi = {
     getToday: () =>
         api.get('/analytics/today'),
 };
+
+
+export const settingsApi = {
+    getSettings:() =>
+        api.get<UserSettings>('/settings'),
+    updateSettings:(settings:Partial<UserSettings>) =>
+        api.put<UserSettings>('/settings',settings)
+    
+}
 
 
 export default api;
