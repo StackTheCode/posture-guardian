@@ -1,6 +1,6 @@
-# 🧘 Posture Guardian
+#  Posture Guardian
 
-AI-powered desktop agent for posture monitoring and ergonomic health.
+ Desktop agent for posture monitoring and ergonomic health.
 
 ## Architecture
 
