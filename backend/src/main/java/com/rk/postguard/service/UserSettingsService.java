@@ -19,7 +19,7 @@ public class UserSettingsService {
     private final UserRepository userRepository;
 
 
-    @Transactional(readOnly = true)
+    @Transactional
     public UserSettingsDto getSettings(String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -31,7 +31,7 @@ public class UserSettingsService {
     }
 
 
-    @Transactional(readOnly = true)
+    @Transactional
     public UserSettingsDto updateSettings (String username,UserSettingsDto dto){
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -79,6 +79,7 @@ public class UserSettingsService {
         return  UserSettingsDto.builder()
                 .captureIntervalSeconds(settings.getCaptureIntervalSeconds())
                 .notificationsEnabled(settings.getNotificationsEnabled())
+                .notificationSensitivity(settings.getNotificationSensitivity())
                 .workingHoursEnabled(settings.getWorkingHoursEnabled())
                 .workingHoursStart(settings.getWorkingHoursStart())
                 .workingHoursEnd(settings.getWorkingHoursEnd())
