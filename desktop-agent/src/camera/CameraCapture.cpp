@@ -23,7 +23,7 @@ bool CameraCapture::initialize(){
 }
 
 bool CameraCapture::captureFrame(cv::Mat &frame){
-    if (camera.isOpened()){
+    if (!camera.isOpened()){
         std::cerr << "Camera is not initialized" << std::endl;
     }
     camera >> frame;

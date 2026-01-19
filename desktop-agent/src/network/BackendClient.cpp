@@ -136,3 +136,43 @@ bool BackendClient::sendPostureEvent(std::string &postureState, double confidenc
     std::cerr << " Backend returned error: " << http_code << std::endl;
     return false;
 }
+
+
+bool BackendClient::fetchSettings(int& captureInterval, bool& notificationsEnabled, std::string& sensitivity){
+    CURL* curl = curl_easy_init();
+    if(!curl)  return false;
+    std::string readBuffer;
+    std::string url = baseUrl + "/settings";
+
+    struct curl_slist* headers = nullptr;
+    headers = curl_slist_append(headers, "Content-Type: application/json");
+    std::string authHeader = "Authorization: Bearer " + token;
+    headers = curl_slist_append(headers, authHeader.c_str());
+
+    curl_easy_setopt(curl,CURLOPT_URL,url.c_str());
+    curl_easy_setopt(curl,CURLOPT_HTTPHEADER,headers);
+    curl_easy_setopt(curl,CURLOPT_WRITEFUNCTION,WriteCallback);
+    curl_easy_setopt(curl,CURLOPT_WRITEDATA,&readBuffer);
+
+
+        CURLcode res = curl_easy_perform(curl);
+    curl_slist_free_all(headers);
+    curl_easy_cleanup(curl);
+    if (res != CURLE_OK) return false;
+
+try{
+    json response = json::parse(readBuffer);
+    captureInterval = response["captureIntervalSeconds"];
+    notificationsEnabled = response["notificationsEnabled"];
+    sensitivity = response["notificationSensitivity"];
+    
+    std::cout << "Fetched all settings: interval=" << captureInterval<<
+    "s, notifications="<<(notificationsEnabled ? "On" : "Of") << std::endl;
+
+    return true;
+
+} catch(const std::exception& e){
+    std::cout << "Failed to fetch settings"<< e.what()<<std::endl;
+    return false;
+}
+}

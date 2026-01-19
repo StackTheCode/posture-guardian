@@ -12,8 +12,11 @@ class BackendClient{
 
     
         bool login();
-bool isAuthenticated() const { return !token.empty(); }
+        bool isAuthenticated() const { return !token.empty(); }
         bool sendPostureEvent(std::string& postureState, double confidence,double severity);
+
+        bool fetchSettings(int& captureInterval, bool& notificationsEnabled, std::string& sensitivity);
+
 
     private:
     std::string baseUrl;

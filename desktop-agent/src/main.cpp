@@ -7,24 +7,49 @@
 #include "network/MLEngineClient.h"
 #include "ui/TrayIcon.h"
 #include "utils/Notification.h"
-std::atomic running(true);
-std::atomic paused(false);
 
+std::atomic<bool> running(true);
+std::atomic<bool> paused(false);
+
+
+
+std::atomic<int> captureInterval(30);
+std::atomic<bool> notificationsEnabled(true);
+std::string notificationSensitivity = "medium";
 void monitoringLoop(
     CameraCapture &camera,
     MLEngineClient &mlClient,
     BackendClient &backendClient,
-    TrayIcon &tray,
-    int interval)
+    TrayIcon &tray)
 {
-    while (running)
-    {
+    auto lastSettingsCheck = std::chrono::steady_clock::now();
+    while (running){
         // Check if paused
         if (paused)
         {
             std::this_thread::sleep_for(std::chrono::seconds(1));
             continue;
         }
+        // Check for settings updates every 30 seconds
+      auto now = std::chrono::steady_clock::now();
+if (std::chrono::duration_cast<std::chrono::seconds>(now - lastSettingsCheck).count() >= 30)
+{
+    int newInterval;
+    bool newNotificationsEnabled;
+    std::string newSensitivity;
+    
+    if (backendClient.fetchSettings(newInterval, newNotificationsEnabled, newSensitivity))
+    {
+        captureInterval.store(newInterval);
+        notificationsEnabled.store(newNotificationsEnabled);
+        notificationSensitivity = newSensitivity;
+         std::cout << " Settings updated: interval=" << newInterval 
+                          << "s, notifications=" << (newNotificationsEnabled ? "on" : "off")
+                          << ", sensitivity=" << newSensitivity << std::endl;
+    }
+    
+    lastSettingsCheck = now;
+}
 
         // Capture frame
         cv::Mat frame;
@@ -42,32 +67,36 @@ void monitoringLoop(
 
         // Analyze posture
         PostureResult result;
-        if (mlClient.analyzePosture(imageData, result))
-        {
+        if (mlClient.analyzePosture(imageData, result)){
             std::cout << "  → Posture: " << result.postureState
                       << " (confidence: " << (result.confidence * 100) << "%)" << std::endl;
 
             // Update tray icon
-            if (result.postureState == "good")
-            {
+            if (result.postureState == "good"){
                 tray.setIcon("good");
             }
-            else if (result.severity > 0.5)
-            {
+            else if (result.severity > 0.5){
                 tray.setIcon("error");
 
-                // Show notification for bad posture
-                Notification::showWarning(
-                    "Posture Alert",
-                    result.recommendations[0]);
-            }
-            else
-            {
+                if(notificationsEnabled.load()){
+                      bool shouldNotify = false;
+                    if (notificationSensitivity == "low" && result.severity > 0.8) {
+                        shouldNotify = true;
+                    } else if (notificationSensitivity == "medium" && result.severity > 0.5) {
+                        shouldNotify = true;
+                    } else if (notificationSensitivity == "high" && result.severity > 0.3) {
+                        shouldNotify = true;
+                    }
+                    
+                    if (shouldNotify && !result.recommendations.empty()) {
+                        Notification::showWarning("Posture Alert", result.recommendations[0]);
+                    }
+                }
+            }  else{
                 tray.setIcon("warning");
             }
 
             // Send to backend
-            // Config& config = Config::getInstance();
             if (backendClient.isAuthenticated())
             {
                 backendClient.sendPostureEvent(
@@ -75,14 +104,12 @@ void monitoringLoop(
                     result.confidence,
                     result.severity);
             }
-        }
-        else
-        {
+        } else {
             std::cerr << "ML analysis failed" << std::endl;
         }
 
         // Wait for next capture
-        std::this_thread::sleep_for(std::chrono::seconds(interval));
+        std::this_thread::sleep_for(std::chrono::seconds(captureInterval.load()));
     }
 }
 
@@ -97,6 +124,9 @@ int main(int argc, char *argv[])
         std::cerr << "Failed to load configuration" << std::endl;
         return 1;
     }
+
+        captureInterval.store(config.getCaptureInterval());
+
 
     // Initialize camera
     CameraCapture camera(config.getCameraIndex());
@@ -167,14 +197,13 @@ int main(int argc, char *argv[])
         std::ref(camera),
         std::ref(mlClient),
         std::ref(backendClient),
-        std::ref(tray),
-        config.getCaptureInterval());
+        std::ref(tray));
 
     // Main message loop for tray icon
     while (running)
     {
         tray.processMessages();
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 
     // Wait for monitoring thread to finish
