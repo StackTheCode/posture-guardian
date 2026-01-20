@@ -18,6 +18,7 @@ set(SOURCES
     src/network/BackendClient.cpp
     src/utils/Config.cpp
     src/utils/Notification.cpp
+    src/utils/TimeUtils.cpp
     src/ui/TrayIcon.cpp
 )
 

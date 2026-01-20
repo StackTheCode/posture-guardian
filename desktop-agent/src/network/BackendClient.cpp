@@ -138,9 +138,12 @@ bool BackendClient::sendPostureEvent(std::string &postureState, double confidenc
 }
 
 
-bool BackendClient::fetchSettings(int& captureInterval, bool& notificationsEnabled, std::string& sensitivity){
+bool BackendClient::fetchSettings(UserSettings& settings){
     CURL* curl = curl_easy_init();
-    if(!curl)  return false;
+    if (!curl) {
+        std::cerr << "Failed to initialize CURL for settings" << std::endl;
+        return false;
+    }
     std::string readBuffer;
     std::string url = baseUrl + "/settings";
 
@@ -154,20 +157,48 @@ bool BackendClient::fetchSettings(int& captureInterval, bool& notificationsEnabl
     curl_easy_setopt(curl,CURLOPT_WRITEFUNCTION,WriteCallback);
     curl_easy_setopt(curl,CURLOPT_WRITEDATA,&readBuffer);
 
+    long http_code = 0;
+    CURLcode res = curl_easy_perform(curl);
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
 
-        CURLcode res = curl_easy_perform(curl);
     curl_slist_free_all(headers);
     curl_easy_cleanup(curl);
-    if (res != CURLE_OK) return false;
+      if (res != CURLE_OK) {
+        std::cerr << "Failed to fetch settings: " << curl_easy_strerror(res) << std::endl;
+        return false;
+    }
+     if (http_code == 401) {
+        std::cout << "⚠️ Token expired during settings fetch, re-authenticating..." << std::endl;
+        if (login()) {
+            return fetchSettings(settings);  // Retry
+        }
+        return false;
+    }
+
+    if (http_code != 200) {
+        std::cerr << "Settings fetch failed with HTTP " << http_code << std::endl;
+        return false;
+    }
 
 try{
     json response = json::parse(readBuffer);
-    captureInterval = response["captureIntervalSeconds"];
-    notificationsEnabled = response["notificationsEnabled"];
-    sensitivity = response["notificationSensitivity"];
+        settings.captureIntervalSeconds = response["captureIntervalSeconds"];
+        settings.notificationsEnabled = response["notificationsEnabled"];
+        settings.notificationSensitivity = response["notificationSensitivity"];
+        settings.workingHoursEnabled = response["workingHoursEnabled"];
+        settings.workingHoursStart = response["workingHoursStart"];
+        settings.workingHoursEnd = response["workingHoursEnd"];
+        settings.cameraIndex = response["cameraIndex"];
+        settings.theme = response["theme"];
     
-    std::cout << "Fetched all settings: interval=" << captureInterval<<
-    "s, notifications="<<(notificationsEnabled ? "On" : "Of") << std::endl;
+        std::cout << " Fetched settings: interval=" << settings.captureIntervalSeconds 
+                  << "s, notifications=" << (settings.notificationsEnabled ? "on" : "off")
+                  << ", working_hours=" << (settings.workingHoursEnabled ? "enabled" : "disabled");
+
+        if(settings.workingHoursEnabled){
+            std::cout << " (" << settings.workingHoursStart << " - " << settings.workingHoursEnd << ")";
+        }
+        std::cout << std::endl;
 
     return true;
 

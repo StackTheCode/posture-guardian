@@ -2,6 +2,7 @@
 #include <thread>
 #include <opencv2/opencv.hpp>
 #include "utils/Config.h"
+#include "utils/TimeUtils.h"
 #include "camera/CameraCapture.h"
 #include "network/BackendClient.h"
 #include "network/MLEngineClient.h"
@@ -11,11 +12,10 @@
 std::atomic<bool> running(true);
 std::atomic<bool> paused(false);
 
+UserSettings currentSettings;
+std::mutex settingsMutex;
 
 
-std::atomic<int> captureInterval(30);
-std::atomic<bool> notificationsEnabled(true);
-std::string notificationSensitivity = "medium";
 void monitoringLoop(
     CameraCapture &camera,
     MLEngineClient &mlClient,
@@ -32,23 +32,34 @@ void monitoringLoop(
         }
         // Check for settings updates every 30 seconds
       auto now = std::chrono::steady_clock::now();
-if (std::chrono::duration_cast<std::chrono::seconds>(now - lastSettingsCheck).count() >= 30)
-{
-    int newInterval;
-    bool newNotificationsEnabled;
-    std::string newSensitivity;
+if (std::chrono::duration_cast<std::chrono::seconds>(now - lastSettingsCheck).count() >= 30){
+    UserSettings newSettings;
     
-    if (backendClient.fetchSettings(newInterval, newNotificationsEnabled, newSensitivity))
-    {
-        captureInterval.store(newInterval);
-        notificationsEnabled.store(newNotificationsEnabled);
-        notificationSensitivity = newSensitivity;
-         std::cout << " Settings updated: interval=" << newInterval 
-                          << "s, notifications=" << (newNotificationsEnabled ? "on" : "off")
-                          << ", sensitivity=" << newSensitivity << std::endl;
+    if (backendClient.fetchSettings(newSettings)){
+        std::lock_guard<std::mutex> lock(settingsMutex);
+       currentSettings = newSettings;
     }
     
     lastSettingsCheck = now;
+}
+
+{
+    std::lock_guard<std::mutex> lock(settingsMutex);
+    if(currentSettings.workingHoursEnabled){
+        if(!TimeUtils::isWithinWorkingHours(currentSettings.workingHoursStart,currentSettings.workingHoursEnd)){
+            int currentMinutes = TimeUtils::getCurrentMinutes();
+            int hours = currentMinutes / 60;
+            int mins = currentMinutes % 60;
+            std::cout << "Outside working hours (current: " 
+                              << (hours < 10 ? "0" : "") << hours << ":" 
+                              << (mins < 10 ? "0" : "") << mins 
+                              << ", working: " << currentSettings.workingHoursStart 
+                              << " - " << currentSettings.workingHoursEnd << ")" << std::endl;
+
+            std::this_thread::sleep_for(std::chrono::minutes(1));
+            continue;
+        }
+    }
 }
 
         // Capture frame
@@ -63,42 +74,47 @@ if (std::chrono::duration_cast<std::chrono::seconds>(now - lastSettingsCheck).co
         std::cout << "[" << std::time(nullptr) << "] Frame captured" << std::endl;
 
         // Encode to JPEG
-        std::vector imageData = camera.encodeFrameToJpeg(frame);
+        std::vector<uchar> imageData = camera.encodeFrameToJpeg(frame);
 
         // Analyze posture
         PostureResult result;
         if (mlClient.analyzePosture(imageData, result)){
-            std::cout << "  → Posture: " << result.postureState
+            std::cout << "Posture: " << result.postureState
                       << " (confidence: " << (result.confidence * 100) << "%)" << std::endl;
 
             // Update tray icon
             if (result.postureState == "good"){
                 tray.setIcon("good");
             }
-            else if (result.severity > 0.5){
+             else if (result.severity > 0.5){
                 tray.setIcon("error");
 
-                if(notificationsEnabled.load()){
-                      bool shouldNotify = false;
-                    if (notificationSensitivity == "low" && result.severity > 0.8) {
-                        shouldNotify = true;
-                    } else if (notificationSensitivity == "medium" && result.severity > 0.5) {
-                        shouldNotify = true;
-                    } else if (notificationSensitivity == "high" && result.severity > 0.3) {
-                        shouldNotify = true;
-                    }
+                bool shouldNotify = false;
+                {
+                    std::lock_guard<std::mutex> lock(settingsMutex);
                     
-                    if (shouldNotify && !result.recommendations.empty()) {
-                        Notification::showWarning("Posture Alert", result.recommendations[0]);
+                    if (currentSettings.notificationsEnabled)
+                    {
+                        // Apply sensitivity threshold
+                        if (currentSettings.notificationSensitivity == "low" && result.severity > 0.8) {
+                            shouldNotify = true;
+                        } else if (currentSettings.notificationSensitivity == "medium" && result.severity > 0.5) {
+                            shouldNotify = true;
+                        } else if (currentSettings.notificationSensitivity == "high" && result.severity > 0.3) {
+                            shouldNotify = true;
+                        }
                     }
+                }
+                
+                if (shouldNotify && !result.recommendations.empty()){
+                    Notification::showWarning("Posture Alert", result.recommendations[0]);
                 }
             }  else{
                 tray.setIcon("warning");
             }
 
             // Send to backend
-            if (backendClient.isAuthenticated())
-            {
+            if (backendClient.isAuthenticated()){
                 backendClient.sendPostureEvent(
                     result.postureState,
                     result.confidence,
@@ -107,9 +123,13 @@ if (std::chrono::duration_cast<std::chrono::seconds>(now - lastSettingsCheck).co
         } else {
             std::cerr << "ML analysis failed" << std::endl;
         }
-
+        int interval;
+        {
+            std::lock_guard<std::mutex> lock (settingsMutex);
+            interval = currentSettings.captureIntervalSeconds;
+        }
         // Wait for next capture
-        std::this_thread::sleep_for(std::chrono::seconds(captureInterval.load()));
+        std::this_thread::sleep_for(std::chrono::seconds(interval));
     }
 }
 
@@ -124,8 +144,12 @@ int main(int argc, char *argv[])
         std::cerr << "Failed to load configuration" << std::endl;
         return 1;
     }
-
-        captureInterval.store(config.getCaptureInterval());
+// Initialize settings with config defaults
+       currentSettings.captureIntervalSeconds = config.getCaptureInterval();
+       currentSettings.notificationsEnabled = true;
+       currentSettings.notificationSensitivity = "medium";
+       currentSettings.workingHoursEnabled = false;
+       currentSettings.cameraIndex = config.getCameraIndex();
 
 
     // Initialize camera
@@ -142,15 +166,25 @@ int main(int argc, char *argv[])
 
     if (!backendClient.login())
     {
-        std::cerr << " Failed to login. Check username/password in config.json" << std::endl;
+        std::cerr << "Failed to login. Check username/password in config.json" << std::endl;
         return 1;
     }
+    //Fetch initial settings
+    UserSettings initialSettings;
+    if(backendClient.fetchSettings(initialSettings)){
+        std::lock_guard<std::mutex> lock(settingsMutex);
+        currentSettings = initialSettings;
+        std::cout <<"Initial Settings loaded" << std::endl;
+    }
+
+
+
+
     // Initialize system tray
     TrayIcon tray;
     HINSTANCE hInstance = GetModuleHandle(NULL);
     
-    if (!tray.initialize(hInstance))
-    {
+    if (!tray.initialize(hInstance)){
         std::cerr << "Failed to initialize system tray" << std::endl;
         return 1;
     }
@@ -183,6 +217,12 @@ int main(int argc, char *argv[])
         std::cout << "Exiting..." << std::endl;
         running = false;
     };
+
+    int initialInterval;
+    {
+        std::lock_guard<std::mutex> lock(settingsMutex);
+        initialInterval = currentSettings.captureIntervalSeconds;
+    }
 
     std::cout << "Monitoring in background (check system tray)" << std::endl;
 
