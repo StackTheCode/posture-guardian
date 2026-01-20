@@ -6,7 +6,7 @@ import { PostureIndicator } from "../components/dashboard/PostureIndicator";
 import { StatsCards } from "../components/dashboard/StatsCards";
 import { PostureTimeline } from "../components/dashboard/PostureTimeline";
 import { useNavigate } from "react-router-dom";
-import { BarChart3, LogOut, Wifi, WifiOff } from "lucide-react";
+import { BarChart3, LogOut, Settings, Wifi, WifiOff } from "lucide-react";
 import { useAuthStore } from "../store/authStore";
 import { usePostureWebSocket } from "../hooks/usePostureWebSocket";
 import { usePostureAnalytics } from "../hooks/usePostureAnalytics";
@@ -88,6 +88,12 @@ export const DashboardPage = () => {
         >
           <BarChart3 className="w-5 h-5" />
           View Analytics
+        </button>
+
+        <button onClick={() => navigate('/settings')}
+          className="glass px-6 py-3 rounded-xl cursor-pointer hover:glass-strong transition-all flex items-center gap-2">
+         <Settings className="w-5 h-5"/>
+         Settings
         </button>
       </div>
 
