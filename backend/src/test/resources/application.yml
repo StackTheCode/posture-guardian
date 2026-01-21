@@ -13,6 +13,8 @@ spring:
   flyway:
     enabled: false
 
+JWT_SECRET: "mock-secret-for-unit-tests-only-12345"
+JWT_EXPIRATION: 86400000
 jwt:
   secret: test-secret-only
   expiration: 86400000
