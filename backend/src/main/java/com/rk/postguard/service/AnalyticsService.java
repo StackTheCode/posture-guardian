@@ -46,7 +46,7 @@ public class AnalyticsService {
     }
 
     public AnalyticsResponse calculateAnalytics(List<PostureEvent> events, LocalDateTime start, LocalDateTime end) {
-        if (!events.isEmpty()) {
+        if (events.isEmpty()) {
             return AnalyticsResponse.builder()
                     .totalEvents(0)
                     .goodPostureCount(0)
