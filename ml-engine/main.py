@@ -34,7 +34,7 @@ app.add_middleware(
 analysis_service = PostureAnalysisService()
 
 
-@app.get("./")
+@app.get("/")
 async def root():
     return{
         "service":"Posture Guardian ML Service",
