@@ -65,15 +65,18 @@ class PostureDetector:
      if shoulder_tilt > 0.15:  # Relative tilt
          return PostureState.SHOULDER_TILT, 0.8
 
-    # 3. Forward Lean (Nose position relative to shoulder height)
-    # Use a ratio of torso length to make it distance-independent
-     forward_ratio = (shoulder_center_y - nose.y) / torso_length
-    
-    # If the nose 'drops' too close to the shoulder line (ratio gets smaller)
-    # or moves too far (ratio gets very large), it indicates leaning.
-    # ADJUST THESE based on your 'debug' frame saves
-     if forward_ratio < 0.35: 
-        return PostureState.FORWARD_LEAN, 0.85
+    # 3. Forward Lean (Horizontal head displacement)
+    # Detects when the head is projected forward relative to the shoulder center
+    # Uses X-axis offset (not Y) because forward lean is a front–back issue,
+    # not a vertical one.
+     shoulder_center_x = (left_shoulder.x + right_shoulder.x) / 2
+     nose_forward_offset = abs(nose.x - shoulder_center_x)
+     
+     # If the nose is significantly offset from the shoulder center,
+# the head is leaning forward
+     if nose_forward_offset > 0.07:
+         return PostureState.FORWARD_LEAN,0.85
+
 
     # 4. Slouching (Compressed Torso)
     # Use your saved debug frames to find your 'perfect' torso_length

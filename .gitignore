@@ -5,6 +5,8 @@ __pycache__/
 venv/
 .env
 .env.example
+*.jpg
+.coverage
 
 # Java/Maven
 target/
