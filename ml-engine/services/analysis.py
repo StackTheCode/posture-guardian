@@ -27,7 +27,7 @@ class PostureAnalysisService:
                 "Consider a standing desk break"
             ],
             PostureState.SHOULDER_TILT:[
-                          "Check if your desk height is even",
+                "Check if your desk height is even",
                 "Ensure your chair armrests are level",
                 "You may have one shoulder habitually raised"
             ],
@@ -35,7 +35,11 @@ class PostureAnalysisService:
                 "No person detected in frame",
                 "Make sure there is proper lightining"
                  "Ensure proper lighting and camera position"
-            ]   
+            ],
+            PostureState.TWISTED_SPINE:[
+                "Look at your back and adjust",
+                "If you have medical condition, consult with specialist"
+            ]
         }
         
         
