@@ -51,7 +51,7 @@ export const StatsCards = ({goodPostureCount,badPostureCount,averageSeverity,tot
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: index * 0.1 }}
       >
-        <GlassCard className={`bg-gradient-to-br ${stat.gradient}`}>
+        <GlassCard className={`bg-linear-to-br ${stat.gradient}`}>
           <div className="flex items-start justify-between">
             <div>
               <p className="text-slate-400 text-sm">{stat.label}</p>

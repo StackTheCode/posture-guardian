@@ -19,7 +19,16 @@ export const PostureIndicator = ({ state, confidence, severity }: PostureIndicat
 
             };
 
-        } else {
+        } 
+        else if(state == PostureState.FORWARD_LEAN){
+             return{
+               color: 'from-red-300 to-emerald-600',
+                icon: AlertCircle,
+                label: 'Minor lean',
+                ringColor: 'ring-red-500/50',
+             } 
+        }
+        else {
             return {
                 color: 'from-red-400 to-pink-600',
                 icon: AlertCircle,

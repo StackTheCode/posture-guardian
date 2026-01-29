@@ -36,7 +36,7 @@ export const useSettings = () => {
 
             return true;
         } catch (error) {
-            handleApiError(error, "Failed to save setting");
+            handleApiError(error, "Failed to update setting");
             return false;
         } finally{
             setSaving(false);
