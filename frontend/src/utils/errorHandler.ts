@@ -1,14 +1,14 @@
 import toast from "react-hot-toast"
-import { AxiosError } from "axios"
+import axios from "axios"
 
-export const handleApiError = (error: unknown, fallbackMessage: string = 'An error occurred') => {
-    if (error instanceof AxiosError) {
+export const handleApiError = (error: unknown, fallbackMessage: string = 'Something went wrong') => {
+    if (axios.isAxiosError(error)) {
         const message = error.response?.data?.message || error.message || fallbackMessage;
         const status = error.response?.status;
 
         switch (status) {
             case 401:
-                toast.error("Token session expired");
+                toast.error("Session expired. Please login again.");
                 setTimeout(() => {
                     window.location.href = '/login';
                 }, 2000);
