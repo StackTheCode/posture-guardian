@@ -7,8 +7,16 @@ on:
     branches: [main]
 
 jobs:
+
+# Ml Engine Tests
   test-ml:
+    name: ML Engine tests
     runs-on: ubuntu-latest
+    
+    defaults:
+      run: 
+        working-directory: ./ml-engine
+
     steps:
       - uses: actions/checkout@v4
       
@@ -23,17 +31,24 @@ jobs:
           echo "$HOME/.local/bin" >> $GITHUB_PATH
       
       - name: Install dependencies
-        working-directory: ./ml-engine
-        run: poetry install
+        run: poetry install --no-interaction --no-root
       
       - name: Run tests
-        working-directory: ./ml-engine
         env:
           PYTHONPATH: .
-        run:  echo "Skipping ML tests for now"
+        run: poetry run pytest
 
+
+#  Backend JUnit tests
   test-backend:
+    name: Backend Tests
     runs-on: ubuntu-latest
+
+
+    defaults:
+      run: 
+        working-directory: ./backend
+    
     env:
       JWT_SECRET: ${{ secrets.JWT_SECRET }} 
       JWT_EXPIRATION: ${{ secrets.JWT_EXPIRATION }} 
@@ -45,13 +60,23 @@ jobs:
         with:
           java-version: '21'
           distribution: 'temurin'
+          cache: maven
       
-      - name: Build and test
-        working-directory: ./backend
-        run: mvn clean install -DskipTests
+      - name: Run Maven Tests
+        run: mvn clean test
+
+
+
+  # Frontend Vitest  
 
   test-frontend:
+    name: Frontend Tests
     runs-on: ubuntu-latest
+    
+    defaults:
+      run:
+        working-directory: ./frontend
+  
     steps:
       - uses: actions/checkout@v4
       
@@ -59,11 +84,14 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
       
       - name: Install dependencies
-        working-directory: ./frontend
         run: npm ci
+
+      - name: Run Vitest
+        run: npm run test -- --run
       
       - name: Build
-        working-directory: ./frontend
         run: npm run build
