@@ -2,7 +2,7 @@ import pytest
 import numpy as np
 import cv2
 from pathlib import Path
-
+import os
 
 @pytest.fixture
 def sample_image():
@@ -88,3 +88,8 @@ def slouched_landmarks():
                 
             ]
     return MockLandmarks() 
+
+
+def pytest_sessionfinish(session,exitstatus):
+    if os.getenv("CI"):
+        os._exit(exitstatus)
