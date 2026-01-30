@@ -34,10 +34,19 @@ def resize_image(image:np.ndarray,max_width:int =640) -> np.ndarray:
     height,width =image.shape[:2]
         
     if width > max_width:
-        ratio = max_width / width
-        new_width= max_width
-        new_height = int (height * ratio)
-        image = cv2.resize(image,(new_width,new_height))
+        ratio = max_width / float(width)
+        
+        new_width= int(max_width)
+        new_height = int(round(height * ratio))
+        
+        #  safety for Linux / headless OpenCV
+        new_height = max(1,new_height)
+        
+        image = cv2.resize(
+            image,
+            (new_width,new_height),
+            interpolation=cv2.INTER_AREA
+            )
         
     
     return image    
