@@ -62,7 +62,10 @@ export const useWeeklyAnalytics = () => {
         })
         setError(null)
       } catch (error) {
-        console.error("Failed to fetch analytics: ", error)
+        console.error("Failed to fetch analytics: ", error);
+         setError(
+    error instanceof Error ? error.message : "Failed to fetch analytics"
+  );
       }
       finally {
         setLoading(false);

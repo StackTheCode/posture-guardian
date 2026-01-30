@@ -24,6 +24,7 @@ const LoginPage = () => {
 
         if(!username.trim()     || !password.trim()){
             toast.error("Please enter both username and password");
+            return;
         }
         setLoading(true);
 
@@ -78,6 +79,7 @@ const LoginPage = () => {
                             Username
                         </label>
                         <input
+                        required
                             type="text"
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
@@ -95,6 +97,7 @@ const LoginPage = () => {
                         </label>
                         <div className="relative">
                             <input
+                            required
                                 type={showPassword ? 'text' : 'password'}
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
@@ -133,7 +136,7 @@ const LoginPage = () => {
                             className="text-purple-400 hover:text-purple-300 transition-colors font-medium"
                             disabled={loading}
                         >
-                            Sign up
+                        Sign up
                         </button>
                     </p>
                 </form>
