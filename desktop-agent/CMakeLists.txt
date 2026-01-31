@@ -9,10 +9,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(OpenCV REQUIRED)
 find_package(CURL REQUIRED)
 find_package(nlohmann_json REQUIRED)
+find_package(GTest CONFIG)
+
 
 # Source files
 set(SOURCES
-    src/main.cpp
     src/camera/CameraCapture.cpp
     src/network/MLEngineClient.cpp
     src/network/BackendClient.cpp
@@ -23,7 +24,7 @@ set(SOURCES
 )
 
 # Executable
-add_executable(posture-guardian      ${SOURCES})
+add_executable(posture-guardian src/main.cpp ${SOURCES})
 
 target_include_directories(posture-guardian PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
@@ -34,6 +35,31 @@ target_link_libraries(posture-guardian
     nlohmann_json::nlohmann_json
     shell32
 )
+enable_testing()
+
+add_executable(posture-guardian-tests 
+tests/unit/ConfigTest.cpp
+tests/unit/BackendClientTest.cpp
+tests/unit/TimeUtilsTest.cpp
+${SOURCES}
+)
+
+target_include_directories(posture-guardian-tests
+PRIVATE 
+${CMAKE_CURRENT_SOURCE_DIR}/src)
+
+target_link_libraries( posture-guardian-tests
+${OpenCV_LIBS}
+CURL::libcurl
+GTest::gtest
+GTest::gtest_main
+shell32
+)
+
+include(GoogleTest)
+gtest_discover_tests(posture-guardian-tests)
+
 
 # Copy config file to build directory
 configure_file(config.json ${CMAKE_CURRENT_BINARY_DIR}/config.json COPYONLY)
+configure_file(tests/test_config.json ${CMAKE_BINARY_DIR}/test_config.json COPYONLY)
