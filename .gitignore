@@ -18,6 +18,7 @@ target/
 
 # C++
 desktop-agent/include/nlohmann/json.hpp
+desktop-agent/Testing
 .venv
 build/
 *.exe
