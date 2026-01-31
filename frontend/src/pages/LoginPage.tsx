@@ -57,24 +57,24 @@ const LoginPage = () => {
             <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="glass-strong rounded-3xl p-8 md:p-12 w-full max-w-md shadow-2xl"
+                className="glass-strong rounded-3xl px-6 py-10 md:px-10 md:py-14 w-full max-w-md shadow-2xl"
             >
                 {/* Logo / Title */}
                 <motion.div
                     initial={{ y: -20 }}
                     animate={{ y: 0 }}
-                    className="text-center mb-8"
+                    className="text-center mb-8 "
                 >
                     <h1 className="text-4xl font-bold bg-linear-to-r from-purple-400 to-blue-400 
                        bg-clip-text text-transparent">
                         Posture Guardian
                     </h1>
-                    <p className="text-slate-400 mt-2">Sign in to your account</p>
+                    <p className="text-slate-400 mt-3">Sign in to your account</p>
                 </motion.div>
 
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form onSubmit={handleSubmit} className="flex flex-col gap-5">
                     {/* Username */}
-                    <div>
+                    <div className=' flex flex-col gap-1'>
                         <label className="block text-sm font-medium text-slate-300 mb-2">
                             Username
                         </label>
@@ -91,7 +91,7 @@ const LoginPage = () => {
                     </div>
 
                     {/* Password */}
-                    <div>
+                      <div className='flex flex-col gap-1'>
                         <label className="block text-sm font-medium text-slate-300 mb-2">
                             Password
                         </label>
@@ -121,7 +121,7 @@ const LoginPage = () => {
                     {/* Submit */}
                     <AnimatedButton
                         type="submit"
-                        className="w-full"
+                        className="w-full cursor-pointer"
                         variant="primary"
                     >
                         {loading ? 'Signing in...' : 'Sign In'}
@@ -133,7 +133,7 @@ const LoginPage = () => {
                         <button
                             type="button"
                             onClick={() => navigate('/register')}
-                            className="text-purple-400 hover:text-purple-300 transition-colors font-medium"
+                            className="text-purple-400 hover:text-purple-300 transition-colors font-medium cursor-pointer"
                             disabled={loading}
                         >
                         Sign up

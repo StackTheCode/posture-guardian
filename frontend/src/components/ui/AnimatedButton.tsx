@@ -20,7 +20,12 @@ export const AnimatedButton = ({
 
   const baseStyles = "px-6 py-3 rounded-xl font-semibold transition-all";
   const variantStyles = {
-    primary: "bg-sky-500 hover:bg-sky-400 text-slate-900 hover:from-purple-500 hover:to-blue-500",
+    primary: `bg-gradient-to-r from-sky-500 to-blue-600 
+    hover:from-purple-500 hover:to-blue-500 
+    text-white 
+    shadow-blue-500/20 
+    hover:shadow-purple-500/40 
+    active:scale-[0.98]`,
     secondary: "glass hover:glass-strong"
 
   };
