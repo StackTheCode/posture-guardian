@@ -5,7 +5,6 @@ project(PostureGuardian VERSION 0.1.0)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-
 find_package(OpenCV REQUIRED)
 find_package(CURL REQUIRED)
 find_package(nlohmann_json REQUIRED)
@@ -46,7 +45,9 @@ ${SOURCES}
 
 target_include_directories(posture-guardian-tests
 PRIVATE 
-${CMAKE_CURRENT_SOURCE_DIR}/src)
+${CMAKE_CURRENT_SOURCE_DIR}/src
+${OpenCV_INCLUDE_DIRS}
+)
 
 target_link_libraries( posture-guardian-tests
 ${OpenCV_LIBS}
