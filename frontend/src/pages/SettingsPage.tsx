@@ -4,12 +4,12 @@ import { AlertCircle, Bell, Clock, Moon, RefreshCw, Save, Sun } from "lucide-rea
 import { motion } from 'framer-motion';
 import { GlassCard } from "../components/ui/GlassCard";
 import { AnimatedButton } from "../components/ui/AnimatedButton";
-
+import { useTheme } from '../context/ThemeContext'; 
 
 
 export const SettingsPage = () => {
   const { settings, loading, saving, updateSettings } = useSettings();
-
+  const {  setTheme } = useTheme(); 
   const [formData, setFormData] = useState({
     captureIntervalSeconds: 30,
     notificationsEnabled: true,
@@ -50,6 +50,11 @@ export const SettingsPage = () => {
 
     })
   }
+
+  const handleThemeChange = (newTheme: 'dark' | 'light') => {
+    setFormData({ ...formData, theme: newTheme });
+    setTheme(newTheme);
+  };
   if (loading) {
     <div className='min-h-screen p-6 flex items-center justify-center'>
       <div className="glass-strong rounded-2xl p-8 flex flex-col items-center gap-4">
@@ -273,17 +278,17 @@ export const SettingsPage = () => {
               Theme
             </label>
             <div className="grid grid-cols-2 gap-3">
-              {(['dark', 'light'] as const).map((theme) => (
+              {(['dark', 'light'] as const).map((themeOption) => (
                 <button
-                  key={theme}
-                  onClick={() => setFormData({ ...formData, theme })}
-                  className={`px-4 py-3 rounded-xl transition-all flex items-center justify-center gap-2 ${formData.theme === theme
+                  key={themeOption}
+                  onClick={() => handleThemeChange(themeOption)}
+                  className={`px-4 py-3 rounded-xl transition-all flex items-center justify-center gap-2 ${formData.theme === themeOption
                       ? 'bg-yellow-600 text-white'
                       : 'glass hover:glass-strong'
                     }`}
                 >
-                  {theme === 'dark' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
-                  <span className="capitalize">{theme}</span>
+                  {themeOption === 'dark' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
+                  <span className="capitalize">{themeOption}</span>
                 </button>
               ))}
             </div>
