@@ -1,6 +1,7 @@
 import mediapipe as mp
 import cv2
 import numpy as np
+import math
 from typing import Optional, Tuple
 import logging
 from schemas.posture import PostureState, KeyPoint
@@ -16,87 +17,81 @@ class PostureDetector:
             min_detection_confidence=0.5
         )
     
-    def detect(self, image: np.ndarray) -> Tuple[Optional[PostureState], float, dict]:
-         """
-        Detect posture from image
-        Returns: (posture_state, confidence, keypoints)
-        """
-        # Convert BGR to RGB
-         image_rgb =cv2.cvtColor(image,cv2.COLOR_BGR2RGB)
-         results= self.pose.process(image_rgb)
-         # Process
-         if not results.pose_landmarks:
-             return PostureState.NO_PERSON_DETECTED,0.0,{}
-        #  Landmarks
-         landmarks = results.pose_landmarks.landmark
-         
-         # Get important points
-         nose = landmarks[self.mp_pose.PoseLandmark.NOSE]
-         left_shoulder = landmarks[self.mp_pose.PoseLandmark.LEFT_SHOULDER]
-         right_shoulder = landmarks[self.mp_pose.PoseLandmark.RIGHT_SHOULDER]
-         left_hip = landmarks[self.mp_pose.PoseLandmark.LEFT_HIP]
-         right_hip = landmarks[self.mp_pose.PoseLandmark.RIGHT_HIP]
-         
-        #  Calculate posture metrics
-         posture_state,confidence = self.classify_posture(
-             nose,left_shoulder,right_shoulder,left_hip,right_hip
-         )
-         
-         keypoints = {
-             "nose":{"x": nose.x, "y": nose.y, "confidence":nose.visibility},
-             "left_shoulder":{"x":left_shoulder.x,"y": left_shoulder.y,"confidence":left_shoulder.visibility},
-             "right_shoulder" :{"x":right_shoulder.x,"y": right_shoulder.y,"confidence":right_shoulder.visibility}
-             
-         }
-         return posture_state,confidence,keypoints
-     
-     
-    def classify_posture(self, nose, left_shoulder, right_shoulder, left_hip, right_hip) -> Tuple[PostureState, float]:
-    # 1. Centers and Reference Lengths
-     shoulder_center_y = (left_shoulder.y + right_shoulder.y) / 2
-     hip_center_y = (left_hip.y + right_hip.y) / 2
-     torso_length = abs(shoulder_center_y - hip_center_y)
+    def detect(self, image: np.ndarray) -> Tuple[Optional[PostureState], float, dict, dict]:
+    # Convert and process
+        image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        results = self.pose.process(image_rgb)
+
+        if not results.pose_landmarks:
+           return PostureState.NO_PERSON_DETECTED, 0.0, {}# when testing add {} for metrics
+
+        lm = results.pose_landmarks.landmark
     
-    # Avoid division by zero if person is not fully in frame
-     if torso_length < 0.1: return PostureState.GOOD, 0.5
+    # Extract points for readability
+        nose = lm[self.mp_pose.PoseLandmark.NOSE]
+        l_sh = lm[self.mp_pose.PoseLandmark.LEFT_SHOULDER]
+        r_sh = lm[self.mp_pose.PoseLandmark.RIGHT_SHOULDER]
+        l_ear = lm[self.mp_pose.PoseLandmark.LEFT_EAR]
+        r_ear = lm[self.mp_pose.PoseLandmark.RIGHT_EAR]
+        l_hip = lm[self.mp_pose.PoseLandmark.LEFT_HIP]
+        r_hip = lm[self.mp_pose.PoseLandmark.RIGHT_HIP]
 
-    # 2. Shoulder Tilt (Normalize by torso length)
-     shoulder_tilt = abs(left_shoulder.y - right_shoulder.y) / torso_length
-     if shoulder_tilt > 0.15:  # Relative tilt
-         return PostureState.SHOULDER_TILT, 0.8
+    # --- GEOMETRIC MATH ---
+    # Midpoints
+        sh_x, sh_y = (l_sh.x + r_sh.x) / 2, (l_sh.y + r_sh.y) / 2
+        ear_x, ear_y = (l_ear.x + r_ear.x) / 2, (l_ear.y + r_ear.y) / 2
+        hip_y = (l_hip.y + r_hip.y) / 2
+        sh_width = abs(l_sh.x - r_sh.x)
 
-    # 3. Forward Lean (Horizontal head displacement)
-    # Detects when the head is projected forward relative to the shoulder center
-    # Uses X-axis offset (not Y) because forward lean is a front–back issue,
-    # not a vertical one.
-     shoulder_center_x = (left_shoulder.x + right_shoulder.x) / 2
-     nose_forward_offset = abs(nose.x - shoulder_center_x)
+    # Calculate metrics dictionary
+        metrics = {
+        "lean_angle": math.degrees(math.atan2(abs(ear_x - sh_x), abs(ear_y - sh_y))),
+        "nose_drop": nose.y - sh_y,
+        "torso_ratio": abs(sh_y - hip_y) / (sh_width if sh_width > 0 else 0.1),
+        "tilt_ratio": abs(l_sh.y - r_sh.y) / (sh_width if sh_width > 0 else 0.1)
+        }
+
+    # Get state from classifier
+        state, confidence = self.classify_posture(metrics)
+
+    # Keypoints for drawing (can be nose and shoulder center)
+        keypoints = {
+        "nose": {"x": nose.x, "y": nose.y},
+        "shoulder_center": {"x": sh_x, "y": sh_y},
+        "left_shoulder": {"x": l_sh.x, "y": l_sh.y},  
+        "right_shoulder": {"x": r_sh.x, "y": r_sh.y}
+        }
+
+        return state, confidence, keypoints
      
-     # If the nose is significantly offset from the shoulder center,
-# the head is leaning forward
-     if nose_forward_offset > 0.07:
-         return PostureState.FORWARD_LEAN,0.85
-
-
-    # 4. Slouching (Compressed Torso)
-    # Use your saved debug frames to find your 'perfect' torso_length
-    # then check if current length is < 80% of that.
-     if torso_length < 0.20:
-        return PostureState.SLOUCHED, 0.9
-
-    # 5. Alignment Score
-     shoulder_center_x = (left_shoulder.x + right_shoulder.x) / 2
-     hip_center_x = (left_hip.x + right_hip.x) / 2
-     alignment_offset = abs(shoulder_center_x - hip_center_x)
-
-     if alignment_offset > 0.1:
-         return PostureState.SLOUCHED, 0.7
-
-     return PostureState.GOOD, 0.95 
+     
+  
+    def classify_posture(self, metrics: dict) -> Tuple[PostureState, float]:
+    # Default state
+        best_state = PostureState.GOOD
+        max_confidence = 0.95
     
+    
+    
+    # 1. Check for Shoulder Tilt
+        if metrics['tilt_ratio'] > 0.12:
+           best_state = PostureState.SHOULDER_TILT
+           max_confidence = 0.8
+        
+    # 2. Check for Slouching (Higher priority than tilt)
+        if metrics['torso_ratio'] < 1.79:
+           best_state = PostureState.SLOUCHED
+           max_confidence = 0.85
+
+    # 3. Check for Forward Lean (Highest priority)
+    # Note: We can make this threshold a bit more forgiving to avoid false positives
+        if metrics['lean_angle'] > 15 or metrics['nose_drop'] < -0.38:
+           best_state = PostureState.FORWARD_LEAN
+           max_confidence = 0.9
+
+        return best_state, max_confidence
    
     
     def __del__(self):
         self.pose.close()
-        
-            
+    

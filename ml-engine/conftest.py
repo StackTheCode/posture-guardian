@@ -33,33 +33,24 @@ def mock_landmarks():
             
     class MockLandmarks:
         def __init__(self):
-            self.landmark = [
-                 MockLandmark(0.5, 0.2, 0.9),   # NOSE
-                MockLandmark(0.0, 0.0, 0.0),   # LEFT_EYE_INNER (unused)
-                MockLandmark(0.0, 0.0, 0.0),   # LEFT_EYE (unused)
-                MockLandmark(0.0, 0.0, 0.0),   # LEFT_EYE_OUTER (unused)
-                MockLandmark(0.0, 0.0, 0.0),   # RIGHT_EYE_INNER (unused)
-                MockLandmark(0.0, 0.0, 0.0),   # RIGHT_EYE (unused)
-                MockLandmark(0.0, 0.0, 0.0),   # RIGHT_EYE_OUTER (unused)
-                MockLandmark(0.0, 0.0, 0.0),   # LEFT_EAR (unused)
-                MockLandmark(0.0, 0.0, 0.0),   # RIGHT_EAR (unused)
-                MockLandmark(0.0, 0.0, 0.0),   # MOUTH_LEFT (unused)
-                MockLandmark(0.0, 0.0, 0.0),   # MOUTH_RIGHT (unused)
-                MockLandmark(0.45, 0.35, 0.9), # LEFT_SHOULDER
-                MockLandmark(0.55, 0.35, 0.9), # RIGHT_SHOULDER
-                MockLandmark(0.0, 0.0, 0.0),   # LEFT_ELBOW (unused)
-                MockLandmark(0.0, 0.0, 0.0),   # RIGHT_ELBOW (unused)
-                MockLandmark(0.0, 0.0, 0.0),   # LEFT_WRIST (unused)
-                MockLandmark(0.0, 0.0, 0.0),   # RIGHT_WRIST (unused)
-                MockLandmark(0.0, 0.0, 0.0),   # LEFT_PINKY (unused)
-                MockLandmark(0.0, 0.0, 0.0),   # RIGHT_PINKY (unused)
-                MockLandmark(0.0, 0.0, 0.0),   # LEFT_INDEX (unused)
-                MockLandmark(0.0, 0.0, 0.0),   # RIGHT_INDEX (unused)
-                MockLandmark(0.0, 0.0, 0.0),   # LEFT_THUMB (unused)
-                MockLandmark(0.0, 0.0, 0.0),   # RIGHT_THUMB (unused)
-                MockLandmark(0.45, 0.65, 0.9), # LEFT_HIP
-                MockLandmark(0.55, 0.65, 0.9), # RIGHT_HIP
-            ]
+           self.landmark = [MockLandmark(0.0, 0.0, 0.0)] * 33 # Initialize all 33
+            
+            # --- GOOD POSTURE COORDINATES ---
+            # Center X is 0.5. 
+           self.landmark[0] = MockLandmark(0.5, 0.15, 0.9)   # NOSE (slightly above ears)
+            
+            # EARS: Align these with the shoulders (X=0.45/0.55) to minimize lean angle
+           self.landmark[7] = MockLandmark(0.48, 0.2, 0.9)   # LEFT_EAR
+           self.landmark[8] = MockLandmark(0.52, 0.2, 0.9)   # RIGHT_EAR
+            
+            # SHOULDERS: 
+           self.landmark[11] = MockLandmark(0.45, 0.35, 0.9) # LEFT_SHOULDER
+           self.landmark[12] = MockLandmark(0.55, 0.35, 0.9) # RIGHT_SHOULDER
+            
+            # HIPS:
+           self.landmark[23] = MockLandmark(0.45, 0.65, 0.9) # LEFT_HIP
+           self.landmark[24] = MockLandmark(0.55, 0.65, 0.9) # RIGHT_HIP
+
     return MockLandmarks()
         
 
