@@ -56,10 +56,10 @@ class PostureDetector:
 
     # Keypoints for drawing (can be nose and shoulder center)
         keypoints = {
-        "nose": {"x": nose.x, "y": nose.y},
-        "shoulder_center": {"x": sh_x, "y": sh_y},
-        "left_shoulder": {"x": l_sh.x, "y": l_sh.y},  
-        "right_shoulder": {"x": r_sh.x, "y": r_sh.y}
+        "nose": {"x": nose.x, "y": nose.y, "confidence": getattr(nose, 'visibility', 0.0)},
+        "shoulder_center": {"x": sh_x, "y": sh_y, "confidence": (l_sh.visibility + r_sh.visibility)/2},
+        "left_shoulder": {"x": l_sh.x, "y": l_sh.y, "confidence": l_sh.visibility},  
+        "right_shoulder": {"x": r_sh.x, "y": r_sh.y, "confidence": r_sh.visibility}
         }
 
         return state, confidence, keypoints
@@ -79,7 +79,7 @@ class PostureDetector:
            max_confidence = 0.8
         
     # 2. Check for Slouching (Higher priority than tilt)
-        if metrics['torso_ratio'] < 1.79:
+        if metrics['torso_ratio'] < 1.76:
            best_state = PostureState.SLOUCHED
            max_confidence = 0.85
 

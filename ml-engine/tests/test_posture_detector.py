@@ -101,15 +101,24 @@ class TestPostureDetector:
         
         class MockLandmarks:
             def __init__(self):
-                self.landmark = [
-                    MockLandmark(0.5, 0.2, 0.9),   # NOSE
-                    *[MockLandmark(0.0, 0.0, 0.0) for _ in range(10)],
-                    MockLandmark(0.45, 0.30, 0.9), # LEFT_SHOULDER - higher
-                    MockLandmark(0.55, 0.40, 0.9), # RIGHT_SHOULDER - lower (tilt)
-                    *[MockLandmark(0.0, 0.0, 0.0) for _ in range(10)],
-                    MockLandmark(0.45, 0.65, 0.9), # LEFT_HIP
-                    MockLandmark(0.55, 0.65, 0.9), # RIGHT_HIP
-                ]
+               # MediaPipe uses 33 landmarks. Initialize all to 0.0
+                self.landmark = [MockLandmark(0.0, 0.0, 0.0) for _ in range(33)]
+        
+                # 0: Nose (High up)
+                self.landmark[0] = MockLandmark(0.5, 0.05, 0.9)
+        
+               # 7 & 8: Ears (MUST be at x=0.5 to prevent forward lean trigger)
+                self.landmark[7] = MockLandmark(0.5, 0.05, 0.9)
+                self.landmark[8] = MockLandmark(0.5, 0.05, 0.9)
+        
+               # 11: Left Shoulder (Higher)
+                self.landmark[11] = MockLandmark(0.45, 0.30, 0.9)
+                # 12: Right Shoulder (Lower - creates the tilt)
+                self.landmark[12] = MockLandmark(0.55, 0.45, 0.9)
+        
+                # 23 & 24: Hips (Standard position)
+                self.landmark[23] = MockLandmark(0.45, 0.80, 0.9)
+                self.landmark[24] = MockLandmark(0.55, 0.80, 0.9)
         
         with patch.object(detector.pose, 'process') as mock_process:
             mock_result = Mock()
