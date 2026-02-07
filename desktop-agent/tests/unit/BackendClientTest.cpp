@@ -9,8 +9,7 @@ class BackendClientTest: public ::testing::Test{
        void SetUp() override{
         client = new BackendClient(
             "http://localhost:8080/api/v1",
-            "testuser",
-            "testpass"
+            "testuser"
         );
        }
 

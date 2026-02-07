@@ -1,13 +1,17 @@
 #include <iostream>
 #include <thread>
+#include <atomic>
 #include <opencv2/opencv.hpp>
 #include "utils/Config.h"
 #include "utils/TimeUtils.h"
+#include "utils/PasswordManager.h"  
+#include "ui/SetupWizard.h" 
 #include "camera/CameraCapture.h"
 #include "network/BackendClient.h"
 #include "network/MLEngineClient.h"
 #include "ui/TrayIcon.h"
 #include "utils/Notification.h"
+#include "ui/SetupWizard.h"
 
 std::atomic<bool> running(true);
 std::atomic<bool> paused(false);
@@ -136,7 +140,26 @@ if (std::chrono::duration_cast<std::chrono::seconds>(now - lastSettingsCheck).co
 int main(int argc, char *argv[])
 {
     std::cout << "Posture Guardian - Desktop Agent" << std::endl;
+    
+    if(SetupWizard::isFirstRun()){
+    std::cout << "This is your first run. Let's set up your account.\n" << std::endl;
+    SetupWizard::Credentials credentials;
+    if(!SetupWizard::show(credentials)){
+        std::cerr<< "Setup cancelled"<< std::endl;
+        return 1;
+    }
 
+    if(!PasswordManager::storePassword(credentials.username,credentials.password)){
+        std::cerr << "Warning: Failed to store password securely" << std::endl;
+
+    }
+
+      if (!SetupWizard::saveToConfig(credentials)) {
+            std::cerr << " Failed to save configuration" << std::endl;
+            return 1;
+        }
+    }
+    
     // Load configuration
     Config &config = Config::getInstance();
     if (!config.load("config.json"))
@@ -162,7 +185,47 @@ int main(int argc, char *argv[])
 
     // Initialize clients
     MLEngineClient mlClient(config.getEngineUrl());
-    BackendClient backendClient(config.getBackendUrl(), config.getUsername(), config.getPassword());
+    BackendClient backendClient(config.getBackendUrl(), config.getUsername());
+
+
+    std::string password;
+    if(PasswordManager::retreivePassword(config.getUsername(),password)){
+        std::cout << "Password retrived"<<std::endl;
+        backendClient.setPassword(password);
+    }
+    else{
+        std::cerr << "Failed to retrieve password. Please run setup again." << std::endl;
+
+
+        // Offer to run setup again 
+
+        std::cout << "\nWould you like to re-enter your credentials? (y/n): ";
+char choice ;
+std::cin >> choice;
+if(choice == 'y' || choice == 'Y'){
+    std::cin.ignore();
+    SetupWizard::Credentials credentials;
+    credentials.backendUrl = config.getBackendUrl();
+    credentials.mlEngineUrl = config.getEngineUrl();
+    credentials.username = config.getUsername();
+
+    std::cout << "Password: ";
+
+    HANDLE hStdin = GetStdHandle(STD_INPUT_HANDLE);
+    DWORD mode = 0;
+    GetConsoleMode(hStdin,&mode);
+    SetConsoleMode(hStdin,mode & (~ENABLE_ECHO_INPUT) );
+    std::getline(std::cin,credentials.password);
+    if (PasswordManager::storePassword(credentials.username, credentials.password)) {
+                backendClient.setPassword(credentials.password);
+                std::cout << " Password saved securely" << std::endl;
+            }
+        } else {
+            return 1;
+        }
+
+}
+    
 
     if (!backendClient.login())
     {

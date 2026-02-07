@@ -19,7 +19,9 @@ set(SOURCES
     src/utils/Config.cpp
     src/utils/Notification.cpp
     src/utils/TimeUtils.cpp
+    src/utils/PasswordManager.cpp
     src/ui/TrayIcon.cpp
+    src/ui/SetupWizard.cpp
 )
 
 # Executable

@@ -4,8 +4,11 @@
 #include <sstream>
 #include <iostream>
 
-BackendClient::BackendClient(const std::string& url, const std::string& user, const std::string& pass): baseUrl(url), username(user), password(pass), token("") {}
+BackendClient::BackendClient(const std::string& url, const std::string& user): baseUrl(url), username(user), password(""), token("") {}
 
+void BackendClient::setPassword(const std::string& pass){
+    password  = pass;
+}
 
 size_t BackendClient::WriteCallback(void *conents, size_t size, size_t nmemb, void *userp)
 {
@@ -17,6 +20,12 @@ size_t BackendClient::WriteCallback(void *conents, size_t size, size_t nmemb, vo
 
 bool BackendClient::login(){
     CURL* curl = curl_easy_init();
+
+    if(password.empty()){
+        std::cerr<<"Password not set. Call setPassword() first" << std::endl;
+        return false;
+    }
+
      if (!curl) {
         std::cerr << "Failed to initialize CURL for login" << std::endl;
         return false;
@@ -48,8 +57,8 @@ bool BackendClient::login(){
         std::cerr << "Login failed: " << curl_easy_strerror(res) << std::endl;
         return false;
     }
-std::cout << "Full URL: " << url << std::endl;
-std::cout << "Server Response: [" << readBuffer << "]" << std::endl;
+    std::cout << "Full URL: " << url << std::endl;
+    std::cout << "Server Response: [" << readBuffer << "]" << std::endl;
     try{
       json response = json::parse(readBuffer);
       token = response["token"];

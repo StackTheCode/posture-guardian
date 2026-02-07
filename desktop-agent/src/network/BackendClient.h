@@ -21,9 +21,9 @@ struct UserSettings{
 
 class BackendClient{
     public:
-           BackendClient(const std::string& baseUrl, const std::string& username, const std::string& password);
+           BackendClient(const std::string& baseUrl, const std::string& username);
 
-    
+        void setPassword(const std::string& password);
         bool login();
         bool isAuthenticated() const { return !token.empty(); }
         bool sendPostureEvent(std::string& postureState, double confidence,double severity);
