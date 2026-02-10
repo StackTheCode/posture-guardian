@@ -168,7 +168,7 @@ export const DashboardPage = () => {
         ) :(
           <GlassCard >
             <div className="text-center py-8n text-slate-400">
-              <p className="text-sm mt-2">No popsture data yet today</p>
+              <p className="text-sm mt-2">No posture data yet today</p>
               <p>P.S start your desktop application to begin tracking</p>
             </div>
           </GlassCard>

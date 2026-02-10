@@ -17,10 +17,9 @@ class Config{
     int getCaptureInterval() const {return captureInterval;}
     int getCameraIndex() const {return cameraIndex;}
     std::string getUsername() const {return username;}
-    // std::string getToken() const { return token; }
+   
     std::string getPassword() const;
-    // void setToken(const std::string& t){token = t;}
-
+  
 private:
     Config() = default;
     std::string mlEngineUrl;
@@ -28,8 +27,7 @@ private:
     int captureInterval;
     int cameraIndex;
     std::string username;
-    // std::string password;
-    // std::string token;
+ 
      
     
 

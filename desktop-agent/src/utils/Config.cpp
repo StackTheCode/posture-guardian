@@ -20,8 +20,6 @@ bool Config::load(const std::string &filename)
         captureInterval = config["capture_interval_seconds"];
         cameraIndex = config["camera_index"];
         username = config["username"];
-        // password = config["password"];
-        // token = config["token"];
 
         return true;
     }
