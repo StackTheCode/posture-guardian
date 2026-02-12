@@ -42,7 +42,7 @@ export const useWeeklyAnalytics = () => {
       try {
         setLoading(true);
         const token = localStorage.getItem('token');
-        const response = await axios.get("http://localhost:8080/api/v1/analytics/weekly", {
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/analytics/weekly`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
