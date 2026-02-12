@@ -8,8 +8,11 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     show-sql: false
+
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS}
 
 
   flyway:
