@@ -18,8 +18,6 @@ std::atomic<bool> paused(false);
 
 UserSettings currentSettings;
 std::mutex settingsMutex;
-
-
 void monitoringLoop(
     CameraCapture &camera,
     MLEngineClient &mlClient,
@@ -142,28 +140,18 @@ int main(int argc, char *argv[])
     std::cout << "Posture Guardian - Desktop Agent" << std::endl;
     
     if(SetupWizard::isFirstRun()){
-    std::cout << "This is your first run. Let's set up your account.\n" << std::endl;
     SetupWizard::Credentials credentials;
     if(!SetupWizard::show(credentials)){
         std::cerr<< "Setup cancelled"<< std::endl;
         return 1;
     }
-
-    if(!PasswordManager::storePassword(credentials.username,credentials.password)){
-        std::cerr << "Warning: Failed to store password securely" << std::endl;
-
-    }
-
-      if (!SetupWizard::saveToConfig(credentials)) {
-            std::cerr << " Failed to save configuration" << std::endl;
-            return 1;
-        }
+    PasswordManager::storePassword(credentials.username,credentials.password);
+    SetupWizard::saveToConfig(credentials);
     }
     
     // Load configuration
     Config &config = Config::getInstance();
-    if (!config.load("config.json"))
-    {
+    if (!config.load("config.json")) {
         std::cerr << "Failed to load configuration" << std::endl;
         return 1;
     }
@@ -189,49 +177,26 @@ int main(int argc, char *argv[])
 
 
     std::string password;
+    bool loggedIn = false;
     if(PasswordManager::retreivePassword(config.getUsername(),password)){
-        std::cout << "Password retrived"<<std::endl;
         backendClient.setPassword(password);
+        if(backendClient.login()){
+            loggedIn = true;
+        }
     }
-    else{
-        std::cerr << "Failed to retrieve password. Please run setup again." << std::endl;
-
-
-        // Offer to run setup again 
-
-        std::cout << "\nWould you like to re-enter your credentials? (y/n): ";
-char choice ;
-std::cin >> choice;
-if(choice == 'y' || choice == 'Y'){
-    std::cin.ignore();
-    SetupWizard::Credentials credentials;
-    credentials.backendUrl = config.getBackendUrl();
-    credentials.mlEngineUrl = config.getEngineUrl();
-    credentials.username = config.getUsername();
-
-    std::cout << "Password: ";
-
-    HANDLE hStdin = GetStdHandle(STD_INPUT_HANDLE);
-    DWORD mode = 0;
-    GetConsoleMode(hStdin,&mode);
-    SetConsoleMode(hStdin,mode & (~ENABLE_ECHO_INPUT) );
-    std::getline(std::cin,credentials.password);
-    if (PasswordManager::storePassword(credentials.username, credentials.password)) {
-                backendClient.setPassword(credentials.password);
-                std::cout << " Password saved securely" << std::endl;
-            }
+   if (!loggedIn) {
+        std::cout << "Login failed. Opening Setup Wizard..." << std::endl;
+        SetupWizard::Credentials credentials;
+        if(SetupWizard::show(credentials)) {
+            PasswordManager::storePassword(credentials.username, credentials.password);
+            backendClient.setPassword(credentials.password);
+            if(!backendClient.login()) return 1;
         } else {
             return 1;
         }
-
-}
+    }
     
 
-    if (!backendClient.login())
-    {
-        std::cerr << "Failed to login. Check username/password in config.json" << std::endl;
-        return 1;
-    }
     //Fetch initial settings
     UserSettings initialSettings;
     if(backendClient.fetchSettings(initialSettings)){
@@ -271,8 +236,7 @@ if(choice == 'y' || choice == 'Y'){
 
     tray.onSettings = [&]()
     {
-        std::cout << "Settings clicked" << std::endl;
-        Notification::show("Settings", "Settings UI coming soon!");
+       ShellExecuteA(NULL, "open", "https://your-app.vercel.app/dashboard", NULL, NULL, SW_SHOWNORMAL);
     };
 
     tray.onExit = [&]()
