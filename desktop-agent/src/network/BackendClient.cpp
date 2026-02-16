@@ -9,6 +9,10 @@ BackendClient::BackendClient(const std::string& url, const std::string& user): b
 void BackendClient::setPassword(const std::string& pass){
     password  = pass;
 }
+void BackendClient::setUsername(const std::string& uname){
+    username  = uname;
+}
+
 
 size_t BackendClient::WriteCallback(void *conents, size_t size, size_t nmemb, void *userp)
 {

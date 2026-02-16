@@ -11,6 +11,7 @@ class Config{
         return instance;
      }
     bool load(const std::string& filename);
+    bool save(const std::string& filename);
 
     std::string getEngineUrl()  const {return mlEngineUrl;}
     std::string getBackendUrl() const {return backendUrl;}
@@ -20,6 +21,11 @@ class Config{
    
     std::string getPassword() const;
   
+    void setUsername(std::string uname)  {
+        username = uname;
+    }
+
+
 private:
     Config() = default;
     std::string mlEngineUrl;

@@ -9,6 +9,7 @@ find_package(OpenCV REQUIRED)
 find_package(CURL REQUIRED)
 find_package(nlohmann_json REQUIRED)
 find_package(GTest CONFIG)
+find_package(imgui CONFIG REQUIRED)
 
 
 # Source files
@@ -21,7 +22,7 @@ set(SOURCES
     src/utils/TimeUtils.cpp
     src/utils/PasswordManager.cpp
     src/ui/TrayIcon.cpp
-    src/ui/SetupWizard.cpp
+    src/ui/LoginWindow.cpp
 )
 
 # Executable
@@ -35,6 +36,7 @@ target_link_libraries(posture-guardian
     CURL::libcurl
     nlohmann_json::nlohmann_json
     shell32
+    imgui::imgui
 )
 enable_testing()
 
@@ -42,7 +44,10 @@ add_executable(posture-guardian-tests
 tests/unit/ConfigTest.cpp
 tests/unit/BackendClientTest.cpp
 tests/unit/TimeUtilsTest.cpp
-${SOURCES}
+src/network/BackendClient.cpp
+src/utils/Config.cpp
+src/utils/TimeUtils.cpp
+src/utils/PasswordManager.cpp
 )
 
 target_include_directories(posture-guardian-tests

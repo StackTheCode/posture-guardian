@@ -5,13 +5,13 @@
 #include "utils/Config.h"
 #include "utils/TimeUtils.h"
 #include "utils/PasswordManager.h"  
-#include "ui/SetupWizard.h" 
 #include "camera/CameraCapture.h"
 #include "network/BackendClient.h"
 #include "network/MLEngineClient.h"
 #include "ui/TrayIcon.h"
 #include "utils/Notification.h"
-#include "ui/SetupWizard.h"
+// #include "ui/SetupWizard.h"
+#include "ui/LoginWindow.h"
 
 std::atomic<bool> running(true);
 std::atomic<bool> paused(false);
@@ -135,19 +135,14 @@ if (std::chrono::duration_cast<std::chrono::seconds>(now - lastSettingsCheck).co
     }
 }
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]){
+    /* Production stealth for window */
+#ifdef NDEBUG
+ShowWindow(GetConsoleWindow(), SW_HIDE);
+#endif
     std::cout << "Posture Guardian - Desktop Agent" << std::endl;
     
-    if(SetupWizard::isFirstRun()){
-    SetupWizard::Credentials credentials;
-    if(!SetupWizard::show(credentials)){
-        std::cerr<< "Setup cancelled"<< std::endl;
-        return 1;
-    }
-    PasswordManager::storePassword(credentials.username,credentials.password);
-    SetupWizard::saveToConfig(credentials);
-    }
+    
     
     // Load configuration
     Config &config = Config::getInstance();
@@ -155,12 +150,56 @@ int main(int argc, char *argv[])
         std::cerr << "Failed to load configuration" << std::endl;
         return 1;
     }
-// Initialize settings with config defaults
+      // Initialize settings with config defaults
        currentSettings.captureIntervalSeconds = config.getCaptureInterval();
        currentSettings.notificationsEnabled = true;
        currentSettings.notificationSensitivity = "medium";
        currentSettings.workingHoursEnabled = false;
        currentSettings.cameraIndex = config.getCameraIndex();
+
+
+     // Initialize clients
+    MLEngineClient mlClient(config.getEngineUrl());
+    BackendClient backendClient(config.getBackendUrl(), config.getUsername());
+
+
+     std::string password;
+    bool loggedIn = false;
+
+    if(PasswordManager::retreivePassword(config.getUsername(),password)){
+        backendClient.setPassword(password);
+        if(backendClient.login()){
+            loggedIn = true;
+        }
+    }
+
+
+ if (!loggedIn) {
+    LoginWindow loginGui; 
+    if (loginGui.show()) { 
+        
+   
+        std::string enteredUser = loginGui.getUsername();
+        std::string enteredPass = loginGui.getPassword();
+
+    
+        backendClient.setUsername(enteredUser);
+        backendClient.setPassword(enteredPass);
+
+        if (backendClient.login()) {
+            PasswordManager::storePassword(enteredUser, enteredPass);
+            config.setUsername(enteredUser);
+            config.save("config.json"); 
+            loggedIn = true;
+        } else {
+            // If the server rejects the login, we stop here.
+            return 1; 
+        }
+    } else {
+        return 0; 
+    }
+}
+
 
 
     // Initialize camera
@@ -169,33 +208,7 @@ int main(int argc, char *argv[])
     {
         std::cerr << "Failed to initialize camera" << std::endl;
         return 1;
-    }
-
-    // Initialize clients
-    MLEngineClient mlClient(config.getEngineUrl());
-    BackendClient backendClient(config.getBackendUrl(), config.getUsername());
-
-
-    std::string password;
-    bool loggedIn = false;
-    if(PasswordManager::retreivePassword(config.getUsername(),password)){
-        backendClient.setPassword(password);
-        if(backendClient.login()){
-            loggedIn = true;
-        }
-    }
-   if (!loggedIn) {
-        std::cout << "Login failed. Opening Setup Wizard..." << std::endl;
-        SetupWizard::Credentials credentials;
-        if(SetupWizard::show(credentials)) {
-            PasswordManager::storePassword(credentials.username, credentials.password);
-            backendClient.setPassword(credentials.password);
-            if(!backendClient.login()) return 1;
-        } else {
-            return 1;
-        }
-    }
-    
+    }   
 
     //Fetch initial settings
     UserSettings initialSettings;
@@ -204,10 +217,6 @@ int main(int argc, char *argv[])
         currentSettings = initialSettings;
         std::cout <<"Initial Settings loaded" << std::endl;
     }
-
-
-
-
     // Initialize system tray
     TrayIcon tray;
     HINSTANCE hInstance = GetModuleHandle(NULL);
@@ -236,7 +245,7 @@ int main(int argc, char *argv[])
 
     tray.onSettings = [&]()
     {
-       ShellExecuteA(NULL, "open", "https://your-app.vercel.app/dashboard", NULL, NULL, SW_SHOWNORMAL);
+       ShellExecuteA(NULL, "open", "https://posture-guardian.vercel.app/settings", NULL, NULL, SW_SHOWNORMAL);
     };
 
     tray.onExit = [&]()
