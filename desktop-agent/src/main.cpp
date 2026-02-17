@@ -10,7 +10,6 @@
 #include "network/MLEngineClient.h"
 #include "ui/TrayIcon.h"
 #include "utils/Notification.h"
-// #include "ui/SetupWizard.h"
 #include "ui/LoginWindow.h"
 
 std::atomic<bool> running(true);

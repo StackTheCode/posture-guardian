@@ -37,6 +37,7 @@ target_link_libraries(posture-guardian
     nlohmann_json::nlohmann_json
     shell32
     imgui::imgui
+    opengl32
 )
 enable_testing()
 
