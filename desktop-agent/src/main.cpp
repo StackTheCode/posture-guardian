@@ -11,6 +11,10 @@
 #include "ui/TrayIcon.h"
 #include "utils/Notification.h"
 #include "ui/LoginWindow.h"
+#include <shobjidl.h>
+#include <propvarutil.h>
+#include <propkey.h>
+#include <shlobj.h>
 
 std::atomic<bool> running(true);
 std::atomic<bool> paused(false);
@@ -125,7 +129,7 @@ if (std::chrono::duration_cast<std::chrono::seconds>(now - lastSettingsCheck).co
             std::cerr << "ML analysis failed" << std::endl;
         }
         int interval;
-        {
+        {  
             std::lock_guard<std::mutex> lock (settingsMutex);
             interval = currentSettings.captureIntervalSeconds;
         }
@@ -134,7 +138,57 @@ if (std::chrono::duration_cast<std::chrono::seconds>(now - lastSettingsCheck).co
     }
 }
 
+#pragma comment(lib, "ole32.lib")
+
+void CreateStartMenuShortcut()
+{
+    wchar_t exePath[MAX_PATH];
+    GetModuleFileNameW(NULL, exePath, MAX_PATH);
+
+    wchar_t shortcutPath[MAX_PATH];
+    SHGetFolderPathW(NULL, CSIDL_STARTMENU, NULL, 0, shortcutPath);
+    wcscat_s(shortcutPath, L"\\Programs\\Posture Guardian.lnk");
+
+    IShellLinkW* shellLink = nullptr;
+    CoCreateInstance(CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER,
+                     IID_PPV_ARGS(&shellLink));
+
+    if (shellLink)
+    {
+        shellLink->SetPath(exePath);
+
+        IPropertyStore* propStore = nullptr;
+        shellLink->QueryInterface(IID_PPV_ARGS(&propStore));
+
+        if (propStore)
+        {
+            PROPVARIANT pv;
+            InitPropVariantFromString(L"PostureGuardian.App", &pv);
+            propStore->SetValue(PKEY_AppUserModel_ID, pv);
+            propStore->Commit();
+            PropVariantClear(&pv);
+            propStore->Release();
+        }
+
+        IPersistFile* persistFile = nullptr;
+        shellLink->QueryInterface(IID_PPV_ARGS(&persistFile));
+
+        if (persistFile)
+        {
+            persistFile->Save(shortcutPath, TRUE);
+            persistFile->Release();
+        }
+
+        shellLink->Release();
+    }
+}
+
+
 int main(int argc, char *argv[]){
+    CoInitialize(nullptr);
+
+    SetCurrentProcessExplicitAppUserModelID(L"PostureGuardian.App");
+    CreateStartMenuShortcut();
     /* Production stealth for window */
 #ifdef NDEBUG
 ShowWindow(GetConsoleWindow(), SW_HIDE);
@@ -193,7 +247,7 @@ ShowWindow(GetConsoleWindow(), SW_HIDE);
         } else {
             // If the server rejects the login, we stop here.
             return 1; 
-        }
+        } 
     } else {
         return 0; 
     }

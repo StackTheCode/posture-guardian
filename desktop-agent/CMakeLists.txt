@@ -23,6 +23,8 @@ set(SOURCES
     src/utils/PasswordManager.cpp
     src/ui/TrayIcon.cpp
     src/ui/LoginWindow.cpp
+    src/ui/resources.rc
+    src/ui/resource.h
 )
 
 # Executable
@@ -49,6 +51,7 @@ src/network/BackendClient.cpp
 src/utils/Config.cpp
 src/utils/TimeUtils.cpp
 src/utils/PasswordManager.cpp
+
 )
 
 target_include_directories(posture-guardian-tests

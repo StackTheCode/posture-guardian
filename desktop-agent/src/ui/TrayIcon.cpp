@@ -3,7 +3,7 @@
 #include <shellapi.h>
 #include <iostream>
 #include "TrayIcon.h"
-
+#include "resource.h"
 #define WM_TRAYICON (WM_USER + 1)
 #define ID_TRAY_PAUSE 1001
 #define ID_TRAY_SETTINGS 1002
@@ -57,14 +57,28 @@ bool TrayIcon::initialize(HINSTANCE hInstance)
     nid.uID = 1;
     nid.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
     nid.uCallbackMessage = WM_TRAYICON;
-    nid.hIcon = LoadIcon(NULL, IDI_APPLICATION);
+    nid.hIcon = (HICON)LoadImageA(
+    hInstance,
+    MAKEINTRESOURCEA(IDI_ICON1),
+    IMAGE_ICON,
+    0,
+    0,
+    LR_DEFAULTSIZE
+);
+
+
+   if(!nid.hIcon) {
+        nid.hIcon = LoadIcon(NULL, IDI_APPLICATION);
+        std::cerr << "Warning: Custom icon not loaded, using default" << std::endl;  
+    } else {
+        std::cout << " Custom icon loaded successfully" << std::endl;  
+    }
     strcpy_s(nid.szTip, sizeof(nid.szTip), "Posture Guardian - Monitoring");
 
     if (!Shell_NotifyIconA(NIM_ADD, &nid)) {
         std::cerr << "Failed to add tray icon\n";
         return false;
     }
-
     Shell_NotifyIconA(NIM_SETVERSION, &nid);
 
     createContextMenu();
