@@ -116,7 +116,7 @@ bool BackendClient::sendPostureEvent(std::string &postureState, double confidenc
 
    std::cout << "Sending to: " << url << std::endl;
     std::cout << "Payload: " << jsonStr << std::endl;
-    std::cout << "Token: " << token.substr(0, 20) << "..." << std::endl;
+    // std::cout << "Token: " << token.substr(0, 20) << "..." << std::endl;
 
     CURLcode res = curl_easy_perform(curl);
 
@@ -181,7 +181,7 @@ bool BackendClient::fetchSettings(UserSettings& settings){
         return false;
     }
      if (http_code == 401) {
-        std::cout << "⚠️ Token expired during settings fetch, re-authenticating..." << std::endl;
+        std::cout << "Token expired during settings fetch, re-authenticating..." << std::endl;
         if (login()) {
             return fetchSettings(settings);  // Retry
         }

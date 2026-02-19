@@ -28,12 +28,12 @@ set(SOURCES
 )
 
 # Executable
-add_executable(posture-guardian src/main.cpp ${SOURCES})
+add_executable(PostureGuardian WIN32 src/main.cpp ${SOURCES})
 
-target_include_directories(posture-guardian PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+target_include_directories(PostureGuardian PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 # Link libraries
-target_link_libraries(posture-guardian
+target_link_libraries(PostureGuardian
     ${OpenCV_LIBS}
     CURL::libcurl
     nlohmann_json::nlohmann_json

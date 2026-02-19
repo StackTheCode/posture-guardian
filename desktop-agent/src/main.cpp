@@ -341,3 +341,8 @@ ShowWindow(GetConsoleWindow(), SW_HIDE);
     std::cout << "Goodbye! " << std::endl;
     return 0;
 }
+
+int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
+{
+    return main(__argc, __argv);
+}
