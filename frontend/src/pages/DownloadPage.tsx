@@ -74,7 +74,7 @@ export const DownloadPage = () => {
                                 <motion.a
                                     whileHover={{ scale: 1.02 }}
                                     whileTap={{ scale: 0.98 }}
-                                    href="/PostureGuardian_Setup.exe"
+                                    href="https://github.com/StackTheCode/posture-guardian/releases/latest/download/PostureGuardian_Setup.exe"
                                     download
                                     className="w-full py-4 bg-linear-to-br from-slate-700 via-slate-600 to-slate-700 hover:from-slate-600 hover:via-slate-500 hover:to-slate-600 rounded-2xl flex items-center justify-center gap-3 shadow-lg hover:shadow-xl shadow-slate-900/50 transition-all group relative overflow-hidden border border-slate-600/50"
                                 >
