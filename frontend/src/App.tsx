@@ -7,6 +7,7 @@ import { DashboardPage } from './pages/DashboardPage'
 import RegisterPage from './pages/RegisterPage'
 import { AnalyticsPage } from './pages/AnalyticsPage'
 import { SettingsPage } from './pages/SettingsPage'
+import { DownloadPage } from './pages/DownloadPage'
 
 
 const queryClient = new QueryClient()
@@ -45,6 +46,12 @@ function App() {
             </PrivateRoute>
            }
            />
+           <Route path="/download" 
+           element ={
+            <PrivateRoute>
+              <DownloadPage/>
+            </PrivateRoute>
+           }/>
         </Routes>
       </BrowserRouter>
     </QueryClientProvider>

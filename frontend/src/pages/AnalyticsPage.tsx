@@ -1,12 +1,13 @@
 import { motion } from 'framer-motion';
-import { TrendingUp, TrendingDown, Calendar, Award, RefreshCw, } from 'lucide-react';
+import { TrendingUp, TrendingDown, Calendar, Award, RefreshCw, ArrowLeft, } from 'lucide-react';
 import { GlassCard } from '../components/ui/GlassCard';
 import { BarChart, Bar, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis, PieChart, Pie, Cell } from 'recharts';
 import { useWeeklyAnalytics } from '../hooks/useWeeklyAnalytics';
+import { useNavigate } from 'react-router-dom';
 
 export const AnalyticsPage = () => {
   const { analytics, loading, error } = useWeeklyAnalytics();
-
+  const navigate = useNavigate();
   if (loading) {
     return (
       <div className='min-h-screen p-6 flex items-center justify-center'>
@@ -20,7 +21,7 @@ export const AnalyticsPage = () => {
 
   if (error || !analytics) {
     return (
-       <div className='min-h-screen p-6 flex items-center justify-center'>
+      <div className='min-h-screen p-6 flex items-center justify-center'>
         <div className="glass-strong rounded-2xl p-8 max-w-md text-center">
           <div className="w-16 h-16 rounded-full bg-red-500/20 flex items-center justify-center mx-auto mb-4">
             <span className="text-3xl">⚠️</span>
@@ -30,14 +31,14 @@ export const AnalyticsPage = () => {
             {error || 'Unable to fetch analytics data. Please try again.'}
           </p>
           <div className="flex gap-3 justify-center">
-            <button 
-              onClick={() => window.location.reload()} 
+            <button
+              onClick={() => window.location.reload()}
               className="glass px-6 py-3 rounded-xl hover:glass-strong transition-all"
             >
               Retry
             </button>
-            <button 
-              onClick={() => window.history.back()} 
+            <button
+              onClick={() => window.history.back()}
               className="glass px-6 py-3 rounded-xl hover:glass-strong transition-all"
             >
               Go Back
@@ -55,27 +56,27 @@ export const AnalyticsPage = () => {
       title: analytics.goodPosturePercentage >= 70 ? 'Improving' : 'Needs Work',
       description: `${analytics.goodPosturePercentage.toFixed(0)}% good posture this week`,
       color: analytics.goodPosturePercentage >= 70 ? 'text-green-400' : 'text-yellow-400',
-      bg: analytics.goodPosturePercentage >= 70 
-        ? 'from-green-500/20 to-emerald-500/20' 
+      bg: analytics.goodPosturePercentage >= 70
+        ? 'from-green-500/20 to-emerald-500/20'
         : 'from-yellow-500/20 to-orange-500/20'
     },
     {
       icon: Calendar,
       title: 'Best Day',
       description: (() => {
-  // 1. Safety check: If no data, return a placeholder
-  if (!analytics.weeklyData || analytics.weeklyData.length === 0) {
-    return "No data recorded yet";
-  }
+        // 1. Safety check: If no data, return a placeholder
+        if (!analytics.weeklyData || analytics.weeklyData.length === 0) {
+          return "No data recorded yet";
+        }
 
-  // 2. Provide the first element as the starting point for reduce
-  const bestDay = analytics.weeklyData.reduce((prev, current) => 
-    (current.goodPercentage > prev.goodPercentage) ? current : prev,
-    analytics.weeklyData[0] // Initial value
-  );
-  
-  return `${bestDay.day} - ${bestDay.goodPercentage.toFixed(0)}% good posture`;
-})(),
+        // 2. Provide the first element as the starting point for reduce
+        const bestDay = analytics.weeklyData.reduce((prev, current) =>
+          (current.goodPercentage > prev.goodPercentage) ? current : prev,
+          analytics.weeklyData[0] // Initial value
+        );
+
+        return `${bestDay.day} - ${bestDay.goodPercentage.toFixed(0)}% good posture`;
+      })(),
       color: 'text-blue-400',
       bg: 'from-blue-500/20 to-cyan-500/20'
     },
@@ -97,6 +98,13 @@ export const AnalyticsPage = () => {
 
   return (
     <div className='min-h-screen p-6 flex flex-col gap-10'>
+           <button
+          onClick={() => navigate(-1)}
+          className="flex items-center gap-2 text-slate-400 hover:text-slate-200 transition-colors mb-8 cursor-pointer"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back to Dashboard
+        </button>
       <motion.div
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -111,7 +119,7 @@ export const AnalyticsPage = () => {
       {/* Insight Cards */}
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6'>
         {insightCards.map((insight, index) => (
-          <motion.div 
+          <motion.div
             key={insight.title}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -167,8 +175,8 @@ export const AnalyticsPage = () => {
           {analytics.postureDistribution.length > 0 ? (
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
-                <Pie 
-                  data={analytics.postureDistribution.map(item => ({...item}))}
+                <Pie
+                  data={analytics.postureDistribution.map(item => ({ ...item }))}
                   cx="50%"
                   cy="50%"
                   labelLine={false}
@@ -197,21 +205,19 @@ export const AnalyticsPage = () => {
         <h2 className='text-xl font-semibold mb-4'>Personalized Recommendations</h2>
         <div className='space-y-4'>
           {analytics.insights.map((insight, index) => (
-            <motion.div 
+            <motion.div
               key={index}
-              whileHover={{ x: 5 }} 
+              whileHover={{ x: 5 }}
               className='glass p-4 rounded-xl flex items-start gap-3'
             >
-              <div className={`w-8 h-8 rounded-full ${
-                index === 0 ? 'bg-green-500/20' : 
-                index === 1 ? 'bg-blue-500/20' : 
-                'bg-purple-500/20'
-              } flex items-center justify-center shrink-0`}>
-                <span className={`${
-                  index === 0 ? 'text-green-400' : 
-                  index === 1 ? 'text-blue-400' : 
-                  'text-purple-400'
-                } font-bold`}>{index + 1}</span>
+              <div className={`w-8 h-8 rounded-full ${index === 0 ? 'bg-green-500/20' :
+                  index === 1 ? 'bg-blue-500/20' :
+                    'bg-purple-500/20'
+                } flex items-center justify-center shrink-0`}>
+                <span className={`${index === 0 ? 'text-green-400' :
+                    index === 1 ? 'text-blue-400' :
+                      'text-purple-400'
+                  } font-bold`}>{index + 1}</span>
               </div>
               <div>
                 <p className="text-sm text-slate-300">{insight}</p>

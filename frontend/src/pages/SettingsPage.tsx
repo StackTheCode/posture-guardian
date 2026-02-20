@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
 import { useSettings } from "../hooks/useSettings";
-import { AlertCircle, Bell, Clock, Moon, RefreshCw, Save, Sun } from "lucide-react";
+import { AlertCircle, ArrowLeft, Bell, Clock, Moon, RefreshCw, Save, Sun } from "lucide-react";
 import { motion } from 'framer-motion';
 import { GlassCard } from "../components/ui/GlassCard";
 import { AnimatedButton } from "../components/ui/AnimatedButton";
 import { useTheme } from '../context/ThemeContext'; 
+import { useNavigate } from "react-router-dom";
 
 
 export const SettingsPage = () => {
+  const navigate = useNavigate();
   const { settings, loading, saving, updateSettings } = useSettings();
   const {  setTheme } = useTheme(); 
   const [formData, setFormData] = useState({
@@ -66,6 +68,14 @@ export const SettingsPage = () => {
 
   return (
     <div className='min-h-screen p-6 flex flex-col gap-10'>
+              <button
+                onClick={() => navigate(-1)}
+                className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors mb-8 cursor-pointer"
+            >
+                <ArrowLeft className="w-4 h-4" />
+                Back to Dashboard
+            </button>
+
       <motion.div
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}

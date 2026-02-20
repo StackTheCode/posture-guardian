@@ -12,7 +12,7 @@ export const GlassCard = ({ children, className = '', hover = true }: GlassCardP
         <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            whileHover={hover ? { scale: 1.02, y: -5 } : {}}
+            whileHover={hover ? { scale: 1.02 } : {}}
             className={`glass-strong rounded-2xl p-6 shadow-2xl ${className}`}
         >
             {children}

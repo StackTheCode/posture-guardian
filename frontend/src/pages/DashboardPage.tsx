@@ -6,7 +6,7 @@ import { PostureIndicator } from "../components/dashboard/PostureIndicator";
 import { StatsCards } from "../components/dashboard/StatsCards";
 import { PostureTimeline } from "../components/dashboard/PostureTimeline";
 import { useNavigate } from "react-router-dom";
-import { BarChart3, LogOut, Settings, Wifi, WifiOff } from "lucide-react";
+import { BarChart3, LogOut, Monitor, Settings, Wifi, WifiOff } from "lucide-react";
 import { useAuthStore } from "../store/authStore";
 import { usePostureWebSocket } from "../hooks/usePostureWebSocket";
 import { usePostureAnalytics } from "../hooks/usePostureAnalytics";
@@ -19,12 +19,12 @@ export const DashboardPage = () => {
   // Real time posture Indicator update
   const { postureData, isConnected } = usePostureWebSocket(username!, token!);
 
-// Anallytics data  for stats and timeline
-  const {analytics,loading} = usePostureAnalytics();
+  // Anallytics data  for stats and timeline
+  const { analytics, loading } = usePostureAnalytics();
 
 
 
-  const handleLogout =  () => {
+  const handleLogout = () => {
     logout();
     navigate('/login');
   }
@@ -92,8 +92,14 @@ export const DashboardPage = () => {
 
         <button onClick={() => navigate('/settings')}
           className="glass px-6 py-3 rounded-xl cursor-pointer hover:glass-strong transition-all flex items-center gap-2">
-         <Settings className="w-5 h-5"/>
-         Settings
+          <Settings className="w-5 h-5" />
+          Settings
+        </button>
+
+        <button onClick={() => navigate('/download')}
+          className="glass px-6 py-3 rounded-xl cursor-pointer hover:glass-strong transition-all flex items-center gap-2">
+          <Monitor className="w-5 h-5" />
+          Download Desktop App
         </button>
       </div>
 
@@ -145,16 +151,16 @@ export const DashboardPage = () => {
 
       {loading ? (
         <div className="text-center text-slate-400">Loading analytics...</div>
-      ): (
-         <StatsCards
-        goodPostureCount={analytics.goodPostureCount}
-        badPostureCount={analytics.badPostureCount}
-        averageSeverity={analytics.averageSeverity}
-        totalEvents={analytics.totalEvents}
-      />
+      ) : (
+        <StatsCards
+          goodPostureCount={analytics.goodPostureCount}
+          badPostureCount={analytics.badPostureCount}
+          averageSeverity={analytics.averageSeverity}
+          totalEvents={analytics.totalEvents}
+        />
       )
       }
-     
+
 
       {/* Timeline with real data  */}
       <motion.div
@@ -164,18 +170,18 @@ export const DashboardPage = () => {
         className="mt-6"
       >
         {analytics.timelineData.length > 0 ? (
-  <PostureTimeline data={analytics.timelineData} />
-        ) :(
+          <PostureTimeline data={analytics.timelineData} />
+        ) : (
           <GlassCard >
             <div className="text-center py-8n text-slate-400">
               <p className="text-sm mt-2">No posture data yet today</p>
               <p>P.S start your desktop application to begin tracking</p>
             </div>
           </GlassCard>
-        )  
-        
-      }
-      
+        )
+
+        }
+
       </motion.div>
     </div>
   )
