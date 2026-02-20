@@ -54,6 +54,7 @@ const RegisterPage = () => {
       }, 500);
 
 
+      
 
 
     } catch (err: any) {
