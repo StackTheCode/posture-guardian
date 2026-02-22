@@ -16,6 +16,7 @@
 #include <propkey.h>
 #include <shlobj.h>
 
+
 std::atomic<bool> running(true);
 std::atomic<bool> paused(false);
 
@@ -134,7 +135,10 @@ if (std::chrono::duration_cast<std::chrono::seconds>(now - lastSettingsCheck).co
             interval = currentSettings.captureIntervalSeconds;
         }
         // Wait for next capture
-        std::this_thread::sleep_for(std::chrono::seconds(interval));
+       for(int i = 0; i < interval && running; ++i) {
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+     }
+
     }
 }
 
@@ -230,12 +234,8 @@ ShowWindow(GetConsoleWindow(), SW_HIDE);
  if (!loggedIn) {
     LoginWindow loginGui; 
     if (loginGui.show()) { 
-        
-   
         std::string enteredUser = loginGui.getUsername();
         std::string enteredPass = loginGui.getPassword();
-
-    
         backendClient.setUsername(enteredUser);
         backendClient.setPassword(enteredPass);
 
@@ -257,8 +257,7 @@ ShowWindow(GetConsoleWindow(), SW_HIDE);
 
     // Initialize camera
     CameraCapture camera(config.getCameraIndex());
-    if (!camera.initialize())
-    {
+    if (!camera.initialize()){
         std::cerr << "Failed to initialize camera" << std::endl;
         return 1;
     }   
