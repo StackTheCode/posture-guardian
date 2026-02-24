@@ -68,7 +68,7 @@ export const DownloadPage = () => {
                             <div className="p-8 flex flex-col items-center gap-6">
                                 <div className="text-center">
                                     <p className="text-slate-400 text-sm mb-1">Latest Version</p>
-                                    <p className="text-lg font-semibold">0.1.0</p>
+                                    <p className="text-lg font-semibold">0.2.0</p>
                                 </div>
 
                                 <motion.a

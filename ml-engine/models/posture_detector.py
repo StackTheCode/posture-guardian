@@ -79,13 +79,13 @@ class PostureDetector:
            max_confidence = 0.8
         
     # 2. Check for Slouching (Higher priority than tilt)
-        if metrics['torso_ratio'] < 1.76:
+        if metrics['torso_ratio'] < 1.70:
            best_state = PostureState.SLOUCHED
            max_confidence = 0.85
 
     # 3. Check for Forward Lean (Highest priority)
     # Note: We can make this threshold a bit more forgiving to avoid false positives
-        if metrics['lean_angle'] > 15 or metrics['nose_drop'] < -0.38:
+        if metrics['lean_angle'] > 10 or metrics['nose_drop'] < -0.40:
            best_state = PostureState.FORWARD_LEAN
            max_confidence = 0.9
 
