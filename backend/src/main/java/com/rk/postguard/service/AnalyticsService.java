@@ -106,7 +106,7 @@ public class AnalyticsService {
             }
 
             // Generate insights
-            List<String> insights = new ArrayList<>();
+            List<String> insights = generateInsights(events,goodPosturePercentage,postureDistribution);
 
             return AnalyticsResponse.builder()
                     .totalEvents(totalEvents)
@@ -127,7 +127,6 @@ public class AnalyticsService {
                                             Map<String, Long> distribution) {
      List<String> insights = new ArrayList<>();
       // Insight 1: Overall performance
-
         if(goodPosturePercentage > 80){
             insights.add("Excellent! You're maintaining good posture " +
             String.format("%.0f%%",goodPosturePercentage) + "of the time");
