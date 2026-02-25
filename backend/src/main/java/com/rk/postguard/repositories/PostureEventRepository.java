@@ -1,8 +1,9 @@
 package com.rk.postguard.repositories;
 
 import com.rk.postguard.entity.PostureEvent;
-import com.rk.postguard.entity.User;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -28,4 +29,8 @@ public interface PostureEventRepository extends JpaRepository<PostureEvent,Long>
             @Param("start") LocalDateTime start,
             @Param("end") LocalDateTime end
     );
+
+    @Modifying
+    @Transactional
+    void deleteByUserId(Long user);
 }
