@@ -37,6 +37,13 @@ export const authApi = {
     login: (username: string, password: string) =>
     api.post('/auth/login', { username, password }),
 }
+
+export const usersApi = {
+    deleteAccount: () => api.delete('/users/me')
+}
+
+
+
 export const postureApi = {
   saveEvent: (event: PostureEvent) =>
     api.post('/posture/events', event),

@@ -1,17 +1,21 @@
 import { useEffect, useState } from "react";
 import { useSettings } from "../hooks/useSettings";
-import { AlertCircle, ArrowLeft, Bell, Clock, Moon, RefreshCw, Save, Sun } from "lucide-react";
+import { AlertCircle, ArrowLeft, Bell, Clock, Moon, RefreshCw, Save, Sun, Trash2 } from "lucide-react";
 import { motion } from 'framer-motion';
 import { GlassCard } from "../components/ui/GlassCard";
 import { AnimatedButton } from "../components/ui/AnimatedButton";
-import { useTheme } from '../context/ThemeContext'; 
+import { useTheme } from '../context/ThemeContext';
 import { useNavigate } from "react-router-dom";
+import { usersApi } from "../services/api";
 
 
 export const SettingsPage = () => {
   const navigate = useNavigate();
   const { settings, loading, saving, updateSettings } = useSettings();
-  const {  setTheme } = useTheme(); 
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteConfirmation, setDeleteConfirmation] = useState('');
+
+  const { setTheme } = useTheme();
   const [formData, setFormData] = useState({
     captureIntervalSeconds: 30,
     notificationsEnabled: true,
@@ -23,6 +27,17 @@ export const SettingsPage = () => {
     theme: 'dark' as 'dark' | 'light',
   });
 
+  const handleDeleteAccount = async () => {
+    if (deleteConfirmation !== 'DELETE') return;
+
+    try {
+      await usersApi.deleteAccount();
+      localStorage.clear();
+      navigate('/login');
+    } catch (error) {
+      console.error('Failed to delete account', error);
+    }
+  };
 
 
   useEffect(() => {
@@ -68,13 +83,13 @@ export const SettingsPage = () => {
 
   return (
     <div className='min-h-screen p-6 flex flex-col gap-10'>
-              <button
-                onClick={() => navigate(-1)}
-                className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors mb-8 cursor-pointer"
-            >
-                <ArrowLeft className="w-4 h-4" />
-                Back to Dashboard
-            </button>
+      <button
+        onClick={() => navigate(-1)}
+        className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors mb-8 cursor-pointer"
+      >
+        <ArrowLeft className="w-4 h-4" />
+        Back to Dashboard
+      </button>
 
       <motion.div
         initial={{ y: -20, opacity: 0 }}
@@ -186,8 +201,8 @@ export const SettingsPage = () => {
                       key={level}
                       onClick={() => setFormData({ ...formData, notificationSensitivity: level })}
                       className={`px-4 py-3 rounded-xl transition-all ${formData.notificationSensitivity === level
-                          ? 'bg-purple-600 text-white'
-                          : 'glass hover:glass-strong'
+                        ? 'bg-purple-600 text-white'
+                        : 'glass hover:glass-strong'
                         }`}
                     >
                       <span className="capitalize">{level}</span>
@@ -293,8 +308,8 @@ export const SettingsPage = () => {
                   key={themeOption}
                   onClick={() => handleThemeChange(themeOption)}
                   className={`px-4 py-3 rounded-xl transition-all flex items-center justify-center gap-2 ${formData.theme === themeOption
-                      ? 'bg-yellow-600 text-white'
-                      : 'glass hover:glass-strong'
+                    ? 'bg-yellow-600 text-white'
+                    : 'glass hover:glass-strong'
                     }`}
                 >
                   {themeOption === 'dark' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
@@ -304,6 +319,86 @@ export const SettingsPage = () => {
             </div>
           </div>
         </GlassCard>
+
+        {/* Delete Account */}
+        <GlassCard>
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-3 glass rounded-xl bg-red-500/20">
+              <Trash2 className="w-6 h-6 text-red-400" />
+            </div>
+            <div>
+              <h2 className="text-xl font-semibold text-red-400">Danger Zone</h2>
+              <p className="text-sm text-slate-400">Irreversible account actions</p>
+            </div>
+          </div>
+
+          <div className="flex flex-col items-start gap-5 ">
+            <p className="text-sm text-slate-400">
+              Deleting your account will remove all stored posture data and analytics history. This cannot be undone.
+            </p>
+            <button
+              onClick={() => setShowDeleteModal(true)}
+              className=" px-6 py-2.5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 rounded-xl text-red-400 transition-all font-medium"
+            >
+              Delete My Account
+            </button>
+          </div>
+        </GlassCard>
+        {/* Delete Confirmation Modal */}
+        {showDeleteModal && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="glass-strong rounded-2xl p-6 max-w-md w-full"
+            >
+              <h3 className="text-xl font-semibold text-red-400 mb-4">
+                Delete Account?
+              </h3>
+
+              <div className="space-y-3 mb-6 text-sm text-slate-300">
+                <p>This will permanently delete:</p>
+                <ul className="list-disc list-inside space-y-1 text-slate-400">
+                  <li>All your posture data</li>
+                  <li>Analytics history</li>
+                  <li>Account settings</li>
+                </ul>
+              </div>
+
+              <div className="mb-6">
+                <label className="block text-sm text-slate-400 mb-2">
+                  Type <span className="text-red-400 font-semibold">DELETE</span> to confirm:
+                </label>
+                <input
+                  type="text"
+                  value={deleteConfirmation}
+                  onChange={(e) => setDeleteConfirmation(e.target.value)}
+                  className="w-full px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-xl focus:outline-none focus:border-red-500/50"
+                  placeholder="DELETE"
+                />
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => {
+                    setShowDeleteModal(false);
+                    setDeleteConfirmation('');
+                  }}
+                  className="flex-1 px-4 py-2 glass cursor-pointer rounded-xl hover:light transition-all"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDeleteAccount}
+                  disabled={deleteConfirmation !== 'DELETE'}
+                  className="flex-1 px-4 py-2 cursor-pointer bg-red-500 hover:bg-red-600 disabled:bg-red-500/20 disabled:cursor-not-allowed rounded-xl transition-all"
+                >
+                  Delete Account
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
 
         {/* Save Button */}
         <div className="lg:col-span-2">
