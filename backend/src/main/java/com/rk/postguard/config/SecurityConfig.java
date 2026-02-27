@@ -23,7 +23,7 @@ import java.util.List;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-    @Value("${spring.cors.allowed-origins}")
+    @Value("${CORS_ALLOWED_ORIGINS}")
     private List<String> allowedOrigins;
 
 
@@ -37,7 +37,6 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/auth/**","/api/v1/users/**","/api/v1/analytics/**","/ping","/health","/actuator/**" ,"/ws/**").permitAll()
-//                        .requestMatchers(HttpMethod.DELETE, ).authenticated()
                         .anyRequest().authenticated()
                 )
         .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
