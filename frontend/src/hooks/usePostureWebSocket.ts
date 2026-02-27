@@ -22,7 +22,7 @@ export const usePostureWebSocket = (username: string, token: string) => {
 
 
     const client = new Client({
-      webSocketFactory: () => new SockJS(`${import.meta.env.VITE_API_URL}/ws`),
+      webSocketFactory: () => new SockJS(`${import.meta.env.VITE_WS_URL}/ws`),
       connectHeaders: {
         Authorization: `Bearer ${token}`,
       },
