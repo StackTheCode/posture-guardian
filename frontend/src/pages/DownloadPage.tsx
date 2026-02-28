@@ -7,9 +7,10 @@ export const DownloadPage = () => {
     const navigate = useNavigate();
 
     return (
-        <div className="min-h-screen w-full flex justify-center">
+        <div className="min-h-screen flex justify-center">
 
-            <div className="w-full p-6 ">
+           <div className="w-full  px-6 py-6 flex flex-col gap-2">
+
 
                 <button
                     onClick={() => navigate(-1)}

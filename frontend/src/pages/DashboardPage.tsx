@@ -38,7 +38,8 @@ export const DashboardPage = () => {
 
 
   return (
-    <div className="min-h-screen p-6 flex flex-col gap-10">
+  <div className="min-h-screen flex justify-center">
+    <div className="w-full  px-6 py-6 flex flex-col gap-5">
       {/* Header with Logout */}
       <motion.div
         initial={{ y: -20, opacity: 0 }}
@@ -173,7 +174,7 @@ export const DashboardPage = () => {
           <PostureTimeline data={analytics.timelineData} />
         ) : (
           <GlassCard >
-            <div className="text-center py-8n text-slate-400">
+            <div className="text-center py-8 text-slate-400">
               <p className="text-sm mt-2">No posture data yet today</p>
               <p>P.S start your desktop application to begin tracking</p>
             </div>
@@ -183,6 +184,7 @@ export const DashboardPage = () => {
         }
 
       </motion.div>
+      </div>
     </div>
   )
 }

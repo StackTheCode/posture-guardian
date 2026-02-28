@@ -97,7 +97,8 @@ export const AnalyticsPage = () => {
   ];
 
   return (
-    <div className='min-h-screen p-6 flex flex-col gap-10'>
+    <div className='min-h-screen flex justify-center'>
+         <div className="w-full  px-6 py-6 flex flex-col gap-2">
            <button
           onClick={() => navigate(-1)}
           className="flex items-center gap-2 text-slate-400 hover:text-slate-200 transition-colors mb-8 cursor-pointer"
@@ -226,6 +227,7 @@ export const AnalyticsPage = () => {
           ))}
         </div>
       </GlassCard>
+    </div>
     </div>
   );
 };

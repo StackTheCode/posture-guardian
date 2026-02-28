@@ -63,7 +63,7 @@ const LoginPage = () => {
                 <motion.div
                     initial={{ y: -20 }}
                     animate={{ y: 0 }}
-                    className="text-center mb-8 "
+                    className="text-center mb-1 "
                 >
                     <h1 className="text-4xl font-bold bg-linear-to-r from-purple-400 to-blue-400 
                        bg-clip-text text-transparent">
@@ -74,7 +74,7 @@ const LoginPage = () => {
 
                 <form onSubmit={handleSubmit} className="flex flex-col gap-5">
                     {/* Username */}
-                    <div className=' flex flex-col gap-1'>
+                    <div className=' flex flex-col '>
                         <label className="block text-sm font-medium text-slate-300 mb-2">
                             Username
                         </label>
@@ -91,7 +91,7 @@ const LoginPage = () => {
                     </div>
 
                     {/* Password */}
-                      <div className='flex flex-col gap-1'>
+                      <div className='flex flex-col'>
                         <label className="block text-sm font-medium text-slate-300 mb-2">
                             Password
                         </label>

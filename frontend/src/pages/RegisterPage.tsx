@@ -76,17 +76,17 @@ const RegisterPage = () => {
         <motion.div
           initial={{ y: -20 }}
           animate={{ y: 0 }}
-          className="text-center mb-8"
+          className="text-center mb-2"
         >
           <h1 className="text-4xl font-bold bg-linear-to-r from-purple-400 to-blue-400 
                          bg-clip-text text-transparent">
             Posture Guardian
           </h1>
-          <p className="text-slate-400 mt-2">Create your account</p>
+          <p className="text-slate-400 ">Create your account</p>
         </motion.div>
 
         <form onSubmit={handleSubmit}className='flex flex-col gap-6' >
-          <div className='flex flex-col gap-5'>
+          <div className='flex flex-col gap-3'>
             {/* Username */}
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-2">
@@ -189,7 +189,7 @@ const RegisterPage = () => {
             <button
               type="button"
               onClick={() => navigate('/login')}
-              className="text-purple-400 hover:text-purple-300 transition-colors font-medium"
+              className="cursor-pointer text-purple-400 hover:text-purple-300 transition-colors font-medium"
               disabled={loading}
             >
               Sign in

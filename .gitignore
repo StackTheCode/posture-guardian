@@ -26,6 +26,7 @@ build/
 *.0
 *.so
 *.dll
+imgui.ini
 
 
 # Node

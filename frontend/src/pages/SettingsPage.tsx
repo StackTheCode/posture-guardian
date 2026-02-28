@@ -82,7 +82,8 @@ export const SettingsPage = () => {
   }
 
   return (
-    <div className='min-h-screen p-6 flex flex-col gap-10'>
+    <div className='min-h-screen flex justify-center'>
+          <div className="w-full  px-6 py-6 flex flex-col gap-2">
       <button
         onClick={() => navigate(-1)}
         className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors mb-8 cursor-pointer"
@@ -100,7 +101,7 @@ export const SettingsPage = () => {
         <p className="text-slate-400 mt-1">Customize your posture monitoring experience</p>
       </motion.div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full mx-auto">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-7 w-full mx-auto">
         {/* Monitoring Settings */}
         <GlassCard>
           <div className="flex items-center gap-3 mb-6">
@@ -430,6 +431,7 @@ export const SettingsPage = () => {
           </div>
         </div>
       </div>
+    </div>
     </div>
   )
 }
