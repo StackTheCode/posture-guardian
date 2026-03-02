@@ -124,7 +124,44 @@ Permanently deletes the authenticated user's profile and all associated data fro
 
 
 
+## Settings 
 
+ ### GET /api/v1/settings
+
+Response Body:
+```json
+{
+ "captureIntervalSeconds": 30,
+ "notificationsEnabled": true,
+ "notificationSensitivity": "medium",
+ "workingHoursEnabled": true,
+ "workingHoursStart": "09:00:00",
+ "workingHoursEnd": "17:00:00",
+ "cameraIndex": 0,
+ "theme": "dark"
+}
+
+```
+### PUT api/v1/settings
+Updates those fields
+
+### Analytics
+### GET /api/v1/analytics/weekly
+Weekly analytics
+Response Body:
+
+```json
+{
+"totalEvents":54,
+"goodPostureCount":35,
+"badPostureCount":19,
+"averageSeverity":0.6,
+"goodPosturePercentage":0.7
+}
+```
+
+### GET /api/v1/analytics/today
+In same format returns stats for today. 
 
 
 
