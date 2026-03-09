@@ -18,7 +18,7 @@ export const usePostureWebSocket = (username: string, token: string) => {
       return;
     }
 
-    console.log('Attempting WebSocket connection for user:', username);
+   
 
 
     const client = new Client({
@@ -39,7 +39,6 @@ export const usePostureWebSocket = (username: string, token: string) => {
         client.subscribe(`/user/queue/posture`, (message) => {
           const data = JSON.parse(message.body);
           setPostureData(data);
-          console.log(' Received posture update:', data);
         });
       },
 
