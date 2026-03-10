@@ -127,6 +127,14 @@ bool LoginWindow::show(){
                              ImGuiInputTextFlags_Password);
     ImGui::PopItemWidth();
 
+// Error message if credentials are wrong
+if(!m_errorMessage.empty()){
+ImGui::Dummy(ImVec2(0,5));
+ImGui::PushStyleColor(ImGuiCol_Text,ImVec4(1.0f,0.3f,0.3f,1.0f));
+ImGui::TextWrapped("%s",m_errorMessage.c_str());
+ImGui::PopStyleColor(); 
+}
+
     ImGui::Dummy(ImVec2(0, 25));
 
 
@@ -134,6 +142,7 @@ bool LoginWindow::show(){
        if(ImGui::Button("Sign In", ImVec2(-1, 55))){
             m_username = m_userBuf;
             m_password = m_passBuf;
+            m_errorMessage ="";
             ImGui::End();
             ImGui::Render();
             ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

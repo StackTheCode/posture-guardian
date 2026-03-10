@@ -231,28 +231,27 @@ ShowWindow(GetConsoleWindow(), SW_HIDE);
     }
 
 
- if (!loggedIn) {
+if (!loggedIn) {
     LoginWindow loginGui; 
-    if (loginGui.show()) { 
-        std::string enteredUser = loginGui.getUsername();
-        std::string enteredPass = loginGui.getPassword();
-        backendClient.setUsername(enteredUser);
-        backendClient.setPassword(enteredPass);
+    while (!loggedIn) {  // Loop until authenticated or exited
+        if (loginGui.show()) { 
+            backendClient.setUsername(loginGui.getUsername());
+            backendClient.setPassword(loginGui.getPassword());
 
-        if (backendClient.login()) {
-            PasswordManager::storePassword(enteredUser, enteredPass);
-            config.setUsername(enteredUser);
-            config.save("config.json"); 
-            loggedIn = true;
+            if (backendClient.login()) {
+                PasswordManager::storePassword(loginGui.getUsername(), loginGui.getPassword());
+                config.setUsername(loginGui.getUsername());
+                config.save("config.json"); 
+                loggedIn = true; // This breaks the while loop
+            } else {
+                loginGui.setErrorMessage("Invalid credentials. Please try again.");
+            } 
         } else {
-            // If the server rejects the login, we stop here.
-            return 1; 
-        } 
-    } else {
-        return 0; 
+            // If the user closes the window manually (X or Cancel)
+            return 0; 
+        }
     }
 }
-
 
 
     // Initialize camera
