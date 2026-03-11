@@ -17,12 +17,12 @@ class PostureAnalysisService:
                 "Remember to take breaks every 30 minutes"
             ],
             PostureState.FORWARD_LEAN:[
-                  "Move your screen closer to eye level",
-                "Adjust your chair height",
+                "You are leaning. Sit back and find your center"
+                "Move your screen closer to eye level",
                 "Ensure screen is arm's length away"
             ],
             PostureState.SLOUCHED:[
-                  "Sit up straight with back against chair",
+                  "Use the back of your chair for support",
                 "Check if your chair has proper lumbar support",
                 "Consider a standing desk break"
             ],
