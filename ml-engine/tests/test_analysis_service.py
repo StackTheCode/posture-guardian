@@ -51,7 +51,7 @@ class TestPostureAnalysisService:
             
             assert result.posture_state == PostureState.SLOUCHED
             assert result.severity > 0.5
-            assert "Sit up straight with back against chair" in result.recommendations[0]
+            assert "Use the back of your chair for support" in result.recommendations[0]
             
             
             
