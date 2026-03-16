@@ -10,6 +10,7 @@ import { BarChart3, LogOut, Monitor, Settings, Wifi, WifiOff } from "lucide-reac
 import { useAuthStore } from "../store/authStore";
 import { usePostureWebSocket } from "../hooks/usePostureWebSocket";
 import { usePostureAnalytics } from "../hooks/usePostureAnalytics";
+import StreakCard from "../components/dashboard/StreakCard";
 
 
 export const DashboardPage = () => {
@@ -38,152 +39,157 @@ export const DashboardPage = () => {
 
 
   return (
-  <div className="min-h-screen flex justify-center">
-    <div className="w-full  px-6 py-6 flex flex-col gap-5">
-      {/* Header with Logout */}
-      <motion.div
-        initial={{ y: -20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        className="mb-8"
-      >
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold">Dashboard</h1>
-            <p className="text-slate-400 mt-1">
-              Welcome back, {username}  Monitor your posture in real-time
-            </p>
-            <div className="flex items-center gap-2">
-              {isConnected ? (
-                <>
-                  <Wifi className="w-4 h-4 text-green-400" />
-                  <span className="text-xs text-green-400">Live</span>
+    <div className="min-h-screen flex justify-center">
+      <div className="w-full  px-6 py-6 flex flex-col gap-5">
+        {/* Header with Logout */}
+        <motion.div
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          className="mb-8"
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold">Dashboard</h1>
+              <p className="text-slate-400 mt-1">
+                Welcome back, {username}  Monitor your posture in real-time
+              </p>
+              <div className="flex items-center gap-2">
+                {isConnected ? (
+                  <>
+                    <Wifi className="w-4 h-4 text-green-400" />
+                    <span className="text-xs text-green-400">Live</span>
 
-                </>
-              ) : (
-                <>
-                  <WifiOff className="w-4 h-4 text-red-400" />
-                  <span className="text-xs text-red-400">Offline</span>
+                  </>
+                ) : (
+                  <>
+                    <WifiOff className="w-4 h-4 text-red-400" />
+                    <span className="text-xs text-red-400">Offline</span>
 
-                </>
-              )
-              }
+                  </>
+                )
+                }
+              </div>
             </div>
-          </div>
 
-          {/* Logout Button */}
+            {/* Logout Button */}
+            <button
+              onClick={handleLogout}
+              className="glass px-6 py-3 cursor-pointer rounded-xl hover:glass-strong transition-all flex items-center gap-2 text-red-400 hover:text-red-300"
+            >
+              <LogOut className="w-5 h-5" />
+              Logout
+            </button>
+          </div>
+        </motion.div>
+
+        {/* Action Buttons */}
+        <div className="flex gap-4">
           <button
-            onClick={handleLogout}
-            className="glass px-6 py-3 cursor-pointer rounded-xl hover:glass-strong transition-all flex items-center gap-2 text-red-400 hover:text-red-300"
+            onClick={() => navigate('/analytics')}
+            className="glass px-6 py-3 rounded-xl cursor-pointer hover:glass-strong transition-all flex items-center gap-2"
           >
-            <LogOut className="w-5 h-5" />
-            Logout
+            <BarChart3 className="w-5 h-5" />
+            View Analytics
+          </button>
+
+          <button onClick={() => navigate('/settings')}
+            className="glass px-6 py-3 rounded-xl cursor-pointer hover:glass-strong transition-all flex items-center gap-2">
+            <Settings className="w-5 h-5" />
+            Settings
+          </button>
+
+          <button onClick={() => navigate('/download')}
+            className="glass px-6 py-3 rounded-xl cursor-pointer hover:glass-strong transition-all flex items-center gap-2">
+            <Monitor className="w-5 h-5" />
+            Download Desktop App
           </button>
         </div>
-      </motion.div>
 
-      {/* Action Buttons */}
-      <div className="flex gap-4">
-        <button
-          onClick={() => navigate('/analytics')}
-          className="glass px-6 py-3 rounded-xl cursor-pointer hover:glass-strong transition-all flex items-center gap-2"
-        >
-          <BarChart3 className="w-5 h-5" />
-          View Analytics
-        </button>
+        {/* Main Content */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+          {/* Posture Indicator */}
+          <div className="lg:col-span-1">
+            <GlassCard>
+              <div className="flex flex-col items-center py-4">
+                <h2 className="text-xl text-center font-semibold mb-6">Current Posture</h2>
+                <PostureIndicator
+                  state={currentPosture}
+                  confidence={confidence}
+                  severity={severity}
+                />
+              </div>
+            </GlassCard>
+          </div>
+          
+          {/* StreakCard */}
+          <div className="lg:col-span-1">
+            <StreakCard />
+          </div>
 
-        <button onClick={() => navigate('/settings')}
-          className="glass px-6 py-3 rounded-xl cursor-pointer hover:glass-strong transition-all flex items-center gap-2">
-          <Settings className="w-5 h-5" />
-          Settings
-        </button>
-
-        <button onClick={() => navigate('/download')}
-          className="glass px-6 py-3 rounded-xl cursor-pointer hover:glass-strong transition-all flex items-center gap-2">
-          <Monitor className="w-5 h-5" />
-          Download Desktop App
-        </button>
-      </div>
-
-      {/* Main Content */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-        {/* Posture Indicator */}
-        <div className="lg:col-span-1">
-          <GlassCard>
-            <div className="flex flex-col items-center py-4">
-              <h2 className="text-xl text-center font-semibold mb-6">Current Posture</h2>
-              <PostureIndicator
-                state={currentPosture}
-                confidence={confidence}
-                severity={severity}
-              />
-            </div>
-          </GlassCard>
+          {/* Recommendations */}
+          <div className="lg:col-span-2">
+            <GlassCard>
+              <h2 className="text-xl font-semibold mb-4">Recommendations</h2>
+              <div className="space-y-3">
+                <motion.div
+                  whileHover={{ x: 5 }}
+                  className="glass p-4 rounded-xl"
+                >
+                  <p className="text-slate-300">✓ Take a 5-minute break every hour</p>
+                </motion.div>
+                <motion.div
+                  whileHover={{ x: 5 }}
+                  className="glass p-4 rounded-xl"
+                >
+                  <p className="text-slate-300">✓ Adjust your screen to eye level</p>
+                </motion.div>
+                <motion.div
+                  whileHover={{ x: 5 }}
+                  className="glass p-4 rounded-xl"
+                >
+                  <p className="text-slate-300">✓ Keep your feet flat on the floor</p>
+                </motion.div>
+              </div>
+            </GlassCard>
+          </div>
         </div>
 
-        {/* Recommendations */}
-        <div className="lg:col-span-2">
-          <GlassCard>
-            <h2 className="text-xl font-semibold mb-4">Recommendations</h2>
-            <div className="space-y-3">
-              <motion.div
-                whileHover={{ x: 5 }}
-                className="glass p-4 rounded-xl"
-              >
-                <p className="text-slate-300">✓ Take a 5-minute break every hour</p>
-              </motion.div>
-              <motion.div
-                whileHover={{ x: 5 }}
-                className="glass p-4 rounded-xl"
-              >
-                <p className="text-slate-300">✓ Adjust your screen to eye level</p>
-              </motion.div>
-              <motion.div
-                whileHover={{ x: 5 }}
-                className="glass p-4 rounded-xl"
-              >
-                <p className="text-slate-300">✓ Keep your feet flat on the floor</p>
-              </motion.div>
-            </div>
-          </GlassCard>
-        </div>
-      </div>
+        {/* Stats */}
 
-      {/* Stats */}
-
-      {loading ? (
-        <div className="text-center text-slate-400">Loading analytics...</div>
-      ) : (
-        <StatsCards
-          goodPostureCount={analytics.goodPostureCount}
-          badPostureCount={analytics.badPostureCount}
-          averageSeverity={analytics.averageSeverity}
-          totalEvents={analytics.totalEvents}
-        />
-      )
-      }
-
-
-      {/* Timeline with real data  */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-        className="mt-6"
-      >
-        {analytics.timelineData.length > 0 ? (
-          <PostureTimeline data={analytics.timelineData} />
+        {loading ? (
+          <div className="text-center text-slate-400">Loading analytics...</div>
         ) : (
-          <GlassCard >
-            <div className="text-center py-8 text-slate-400">
-              <p className="text-sm mt-2">No posture data yet today</p>
-              <p>P.S start your desktop application to begin tracking</p>
-            </div>
-          </GlassCard>
+          <StatsCards
+            goodPostureCount={analytics.goodPostureCount}
+            badPostureCount={analytics.badPostureCount}
+            averageSeverity={analytics.averageSeverity}
+            totalEvents={analytics.totalEvents}
+          />
         )
-
         }
 
-      </motion.div>
+
+        {/* Timeline with real data  */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="mt-6"
+        >
+          {analytics.timelineData.length > 0 ? (
+            <PostureTimeline data={analytics.timelineData} />
+          ) : (
+            <GlassCard >
+              <div className="text-center py-8 text-slate-400">
+                <p className="text-sm mt-2">No posture data yet today</p>
+                <p>P.S start your desktop application to begin tracking</p>
+              </div>
+            </GlassCard>
+          )
+
+          }
+
+        </motion.div>
       </div>
     </div>
   )

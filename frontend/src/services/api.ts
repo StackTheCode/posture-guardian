@@ -57,7 +57,10 @@ export const analyticsApi = {
     
     getToday: () =>
         api.get('/analytics/today'),
-};
+  getStreak: async () =>
+    (await api.get<StreakResponse>('/analytics/streak')).data
+    }
+
 
 
 export const settingsApi = {
@@ -66,6 +69,11 @@ export const settingsApi = {
     updateSettings:(settings:Partial<UserSettings>) =>
         api.put<UserSettings>('/settings',settings)
     
+}
+export interface StreakResponse {
+    currentStreak: number;
+    longestStreak: number;
+    lastActivityDate: string;
 }
 
 
