@@ -65,10 +65,6 @@ To fully close the application, click **Exit**.
 - Node.js 21+
 - CMake 3.20+ (for C++)
 
-### Run All Services
-```bash
-docker-compose up -d
-```
 
 ### Individual Setup
 See README in each folder:
@@ -80,9 +76,6 @@ See README in each folder:
 ## Development
 
 ```bash
-# Start databases
-docker-compose up postgres redis -d
-
 # Run services locally (each in separate terminal)
 cd ml-engine && poetry run uvicorn main:app --reload
 cd backend && mvn spring-boot:run
@@ -94,6 +87,6 @@ cd frontend && npm run dev
 - **ML**: MediaPipe, FastAPI, Redis
 - **Backend**: Spring Boot 3, PostgreSQL, WebSocket
 - **Frontend**: React, TypeScript, Vite, TailwindCSS
-- **Desktop**: C++, Qt, OpenCV
+- **Desktop**: C++, ImGui, OpenCV
 - **DevOps**: GitHub Actions, Docker
 
