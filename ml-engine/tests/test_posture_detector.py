@@ -71,15 +71,18 @@ class TestPostureDetector:
         
         class MockLandmarks:
             def __init__(self):
-                self.landmark = [
-                    MockLandmark(0.6, 0.2, 0.9),  # NOSE - very high (forward)
-                    *[MockLandmark(0.0, 0.0, 0.0) for _ in range(10)],
-                    MockLandmark(0.45, 0.35, 0.9), # LEFT_SHOULDER
-                    MockLandmark(0.55, 0.35, 0.9), # RIGHT_SHOULDER
-                    *[MockLandmark(0.0, 0.0, 0.0) for _ in range(10)],
-                    MockLandmark(0.45, 0.65, 0.9), # LEFT_HIP
-                    MockLandmark(0.55, 0.65, 0.9), # RIGHT_HIP
-                ]
+                self.landmark = [MockLandmark(0.0, 0.0, 0.0) for _ in range(33)]
+                
+                # NOSE: Set y=0.1, x=0.6 (Forward and High)
+                self.landmark[0] = MockLandmark(0.6, 0.1, 0.9) 
+                
+                # SHOULDERS: Setting y=0.6 to ensure dy (0.6 - 0.1 = 0.5) is > 0.40
+                self.landmark[11] = MockLandmark(0.5, 0.6, 0.9) # Left
+                self.landmark[12] = MockLandmark(0.5, 0.6, 0.9) # Right
+                
+                # HIPS:
+                self.landmark[23] = MockLandmark(0.5, 0.9, 0.9)
+                self.landmark[24] = MockLandmark(0.5, 0.9, 0.9)
         
         with patch.object(detector.pose, 'process') as mock_process:
             mock_result = Mock()

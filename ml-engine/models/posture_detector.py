@@ -48,9 +48,18 @@ class PostureDetector:
         "lean_angle": math.degrees(math.atan2(abs(ear_x - sh_x), abs(ear_y - sh_y))),
         "nose_drop": nose.y - sh_y,
         "torso_ratio": abs(sh_y - hip_y) / (sh_width if sh_width > 0 else 0.1),
-        "tilt_ratio": abs(l_sh.y - r_sh.y) / (sh_width if sh_width > 0 else 0.1)
+        "tilt_ratio": abs(l_sh.y - r_sh.y) / (sh_width if sh_width > 0 else 0.1),
+        "forward_offset": abs(nose.x - sh_x) / (sh_width if sh_width > 0 else 0.1),
         }
+        # dx = abs(nose.x - sh_x)
+        # dy = abs(nose.y - sh_y)
 
+        # print(
+        #  f"lean={metrics['lean_angle']:.2f}, "
+        #  f"dx={dx:.4f}, "
+        #  f"dy={dy:.4f}",
+        #  f"fo={metrics['forward_offset']:.3f}"
+        # )
     # Get state from classifier
         state, confidence = self.classify_posture(metrics)
 
@@ -68,28 +77,22 @@ class PostureDetector:
   
     def classify_posture(self, metrics: dict) -> Tuple[PostureState, float]:
     # Default state
-        best_state = PostureState.GOOD
-        max_confidence = 0.95
-    
-    
-    
-    # 1. Check for Shoulder Tilt
-        if metrics['tilt_ratio'] > 0.12:
-           best_state = PostureState.SHOULDER_TILT
-           max_confidence = 0.8
-        
-    # 2. Check for Slouching (Higher priority than tilt)
-        if metrics['torso_ratio'] < 1.70:
-           best_state = PostureState.SLOUCHED
-           max_confidence = 0.85
+       fo = metrics['forward_offset']
+       dy = abs(metrics['nose_drop'])
 
-    # 3. Check for Forward Lean (Highest priority)
-    # Note: We can make this threshold a bit more forgiving to avoid false positives
-        if metrics['lean_angle'] > 10 or metrics['nose_drop'] < -0.40:
-           best_state = PostureState.FORWARD_LEAN
-           max_confidence = 0.9
+    # 1. Shoulder tilt FIRST (independent signal)
+       if metrics['tilt_ratio'] > 0.12:
+         return PostureState.SHOULDER_TILT, 0.8
 
-        return best_state, max_confidence
+  # 2. Slouch LAST (fallback bad posture)
+       elif dy < 0.34:
+          return PostureState.SLOUCHED, 0.85
+
+    # 3. Forward lean
+       elif fo > 0.05 and dy > 0.40:
+         return PostureState.FORWARD_LEAN, 0.9
+
+       return PostureState.GOOD, 0.95
    
     
     def __del__(self):
