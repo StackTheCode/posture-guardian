@@ -97,4 +97,5 @@ class PostureDetector:
     
     def __del__(self):
         self.pose.close()
+   
     
